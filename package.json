@@ -4,6 +4,11 @@
   "description": "AI-enabled compliance review of sewerage/sanitary works plans against the Code of Practice on Sewerage and Sanitary Works. Built incrementally, one rule at a time, with reasoning documented in docs/ alongside the code.",
   "type": "module",
   "scripts": {
-    "test": "node --test tests/ssw-1-2-1-b.test.js"
+    "test": "node --test",
+    "typecheck": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "@types/node": "^26.4.1",
+    "typescript": "^7.0.2"
   }
 }

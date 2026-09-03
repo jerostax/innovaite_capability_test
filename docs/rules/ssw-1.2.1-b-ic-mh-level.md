@@ -50,6 +50,6 @@ margin: 10mm
 
 ## Traceability
 
-- Rule logic: [`src/rules/ssw-1-2-1-b-ic-mh-top-level.js`](../../src/rules/ssw-1-2-1-b-ic-mh-top-level.js)
+- Rule logic: [`src/rules/ssw-1-2-1-b-ic-mh-top-level.ts`](../../src/rules/ssw-1-2-1-b-ic-mh-top-level.ts)
 - Rule definition (JSON): [`data/rules/ssw-1-2-1-b-ic-mh-top-level.json`](../../data/rules/ssw-1-2-1-b-ic-mh-top-level.json)
-- Tests (rule card scenarios + the real drawing values above): [`tests/ssw-1-2-1-b.test.js`](../../tests/ssw-1-2-1-b.test.js) -- run with `npm test`
+- Tests (rule card scenarios + the real drawing values above): [`tests/ssw-1-2-1-b.test.ts`](../../tests/ssw-1-2-1-b.test.ts) -- run with `npm test`

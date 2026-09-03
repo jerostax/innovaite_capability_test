@@ -1,7 +1,7 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 
-import * as icMhRule from "../src/rules/ssw-1-2-1-b-ic-mh-top-level.js";
+import * as icMhRule from "../src/rules/ssw-1-2-1-b-ic-mh-top-level.ts";
 
 // Cases transcribed from the rule card's own "Rule Scenario" section
 // (data/rules/ssw-1-2-1-b-ic-mh-top-level.json).

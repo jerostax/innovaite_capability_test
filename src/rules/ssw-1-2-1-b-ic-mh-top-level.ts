@@ -1,4 +1,4 @@
-import { Verdict, result, needsReview } from "./types.js";
+import { Verdict, result, needsReview, type RuleResult } from "./types.ts";
 
 // SSW 1.2.1 (b) - Top level of manhole to inspection chamber.
 // Reasoning and drawing evidence: docs/rules/ssw-1.2.1-b-ic-mh-level.md
@@ -6,10 +6,12 @@ import { Verdict, result, needsReview } from "./types.js";
 
 export const ruleId = "SSW 1.2.1 (b)";
 
-/**
- * @param {object} pair - { inspectionChamberTopLevel_m, manholeTopLevel_m }
- */
-export function evaluate(pair) {
+export interface IcMhPair {
+  inspectionChamberTopLevel_m: number | null;
+  manholeTopLevel_m: number | null;
+}
+
+export function evaluate(pair: IcMhPair): RuleResult {
   const { inspectionChamberTopLevel_m, manholeTopLevel_m } = pair;
 
   if (inspectionChamberTopLevel_m == null || manholeTopLevel_m == null) {
@@ -19,7 +21,7 @@ export function evaluate(pair) {
   }
 
   const compliant = inspectionChamberTopLevel_m >= manholeTopLevel_m;
-  const diff = (inspectionChamberTopLevel_m - manholeTopLevel_m).toFixed(3);
+  const diff = Math.abs(inspectionChamberTopLevel_m - manholeTopLevel_m).toFixed(3);
 
   return result(compliant ? Verdict.COMPLIANT : Verdict.NON_COMPLIANT, {
     confidence: 0.9,
@@ -28,8 +30,8 @@ export function evaluate(pair) {
     ],
     reasoning: [
       compliant
-        ? `IC top level is ${Math.abs(diff)}m ${diff == 0 ? "equal to" : "higher than"} the MH top level -- compliant (equal is explicitly allowed by the rule's own Figure 02 / Scenario 01-Compliant-2).`
-        : `IC top level is ${Math.abs(diff)}m LOWER than the MH top level -- non-compliant.`,
+        ? `IC top level is ${diff}m ${diff === "0.000" ? "equal to" : "higher than"} the MH top level -- compliant (equal is explicitly allowed by the rule's own Figure 02 / Scenario 01-Compliant-2).`
+        : `IC top level is ${diff}m LOWER than the MH top level -- non-compliant.`,
     ],
   });
 }
