@@ -24,22 +24,19 @@ exercise together (per-rule reasoning currently lives in `docs/rules/`).
 
 ## How this project is organized
 
-Two deliberately separate stages, connected by a fixed JSON contract:
-
-```
-READ THE DRAWING  →  structured JSON (data/plans/)  →  APPLY THE RULES (src/rules/)
-     (hard, ambiguous — done by reading the drawing        (simple, deterministic —
-      directly, since no DXF/CAD tooling was available)      unit-tested per rule)
-```
+The design separates two stages: reading the drawing (hard, ambiguous —
+done so far by reading the drawing directly, since no DXF/CAD tooling was
+available) and applying the rules (simple, deterministic, unit-tested per
+rule). A `data/plans/` folder holding structured JSON extracted from each
+drawing — the contract between the two stages — is planned but not built
+yet; each rule is currently tested against values transcribed directly
+from the drawing in its own test file and `docs/rules/*.md` entry.
 
 - **`data/rules/`** — one JSON file per rule: the rule text, how it was
   interpreted, the rule card's own sample scenarios, and every open
   ambiguity or judgement call, with reasoning.
 - **`src/rules/`** — one TypeScript module per rule: a pure `evaluate()`
   function, `RuleResult` in → `{ verdict, confidence, evidence, reasoning }` out.
-- **`src/geometry/`** — 2D geometry helpers (point/segment/polygon
-  distance, intersection) for the one rule that's genuinely spatial
-  (SSW 1.2.4(a)) rather than a label/value lookup.
 - **`src/extraction/`** — a vision-based extraction script (calls the
   Claude API on a drawing image, returns structured data). Written and
   type-checked, deliberately never executed — see
