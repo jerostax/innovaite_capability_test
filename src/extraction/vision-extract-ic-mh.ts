@@ -2,11 +2,18 @@
 // returns the top levels of a paired Inspection Chamber (IC) and Manhole (MH),
 // ready to feed straight into src/rules/ssw-1-2-1-b-ic-mh-top-level.ts.
 //
+// This is not a fallback taken out of convenience: DXF was never available,
+// and PDF text extraction was verified to NOT contain this drawing layer's
+// annotations at all (see docs/design-decisions.md, "Extraction method
+// hierarchy") -- vision is the only one of the three methods tried that can
+// actually read this layer. This script automates that reading step as an
+// actual, callable, testable component, replacing the manual "read it in a
+// chat conversation" process used for the rest of this project.
+//
 // NOT EXECUTED as part of this project (see docs/design-decisions.md,
-// "Why the vision extraction script was not run"). It is written to compile,
-// type-check, and run correctly against a real API key -- this is what
-// automating the manual screenshot-reading in docs/rules/ssw-1.2.1-b-ic-mh-level.md
-// would look like as an actual, callable, testable component.
+// "Why the vision extraction script was not run") -- it compiles and
+// type-checks against the current Anthropic TS SDK's documented API shape,
+// but has never been run against a real API key.
 //
 // To run for real: set ANTHROPIC_API_KEY, then
 //   npx tsx src/extraction/vision-extract-ic-mh.ts path/to/plan-crop.png

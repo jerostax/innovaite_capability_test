@@ -34,6 +34,42 @@ model-reported confidence when using vision extraction -- see the
 `extractionConfidence` field the schema in
 `src/extraction/vision-extract-ic-mh.ts` already asks for).
 
+## Extraction method hierarchy: what we actually tried, in order
+
+It would be easy to read this project as "we skipped proper document
+reading and just eyeballed screenshots." That's not what happened, and it's
+worth being precise about the order of attempts, because each failure was
+a real, verified technical finding, not an assumption:
+
+1. **DXF (vector CAD data, exact text + coordinates)** -- never obtained.
+   No CAD software was available in the environment besides the free
+   Autodesk DWG TrueView viewer, which does not support DXF export (only
+   DWG-version conversion and DWF/DWFx/PDF export). This is the format
+   that would make extraction closest to mechanical/exact; its absence is
+   the single biggest limitation of this project.
+2. **PDF text extraction (mechanically extracted, real embedded text, no
+   vision involved)** -- attempted for both drawings; worked (non-blank)
+   for one of the two (`Annex A - sanitised (2).pdf`), blank for the other
+   (a plot-style issue: screen-oriented colors mapping to invisible colors
+   on white paper, not resolved in the time available).
+   **Verified finding**: even in the PDF that rendered correctly, the
+   extracted text layer does **not** contain the sewer/drainage annotations
+   (no "IC", "MH", "T.L.", or "110.x" substrings anywhere in the extracted
+   text of the page that visibly shows those callout boxes) -- only
+   architectural room labels and the GFA table extracted as text. This
+   means that drainage-annotation layer is very likely drawn with an
+   AutoCAD SHX/shape font, which PDF export rasterizes to vector curves
+   instead of embedding as selectable text. **This was tested, not
+   assumed** -- confirmed by reading the PDF's extracted text and searching
+   it for the values we needed, and not finding them.
+3. **Vision reading of a rendered image (screenshot or PDF page render)**
+   -- the method that actually worked, and the one used for every value in
+   `data/plans/plan-div-sanitised4.json` and
+   `docs/rules/ssw-1.2.1-b-ic-mh-level.md`. Given step 2's verified result,
+   this wasn't a shortcut taken instead of "real" document reading -- it
+   was the only method of the three that could actually read this specific
+   layer of these specific drawings.
+
 ## Why the vision extraction script was not run
 
 `src/extraction/vision-extract-ic-mh.ts` calls the Claude API with an image
