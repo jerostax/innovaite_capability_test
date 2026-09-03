@@ -63,9 +63,8 @@ a real, verified technical finding, not an assumption:
    assumed** -- confirmed by reading the PDF's extracted text and searching
    it for the values we needed, and not finding them.
 3. **Vision reading of a rendered image (screenshot or PDF page render)**
-   -- the method that actually worked, and the one used for every value in
-   `data/plans/plan-div-sanitised4.json` and
-   `docs/rules/ssw-1.2.1-b-ic-mh-level.md`. Given step 2's verified result,
+   -- the method that actually worked, and the one used for every value
+   recorded in `docs/rules/ssw-1.2.1-b-ic-mh-level.md`. Given step 2's verified result,
    this wasn't a shortcut taken instead of "real" document reading -- it
    was the only method of the three that could actually read this specific
    layer of these specific drawings.

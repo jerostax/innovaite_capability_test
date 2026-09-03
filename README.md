@@ -27,10 +27,9 @@ exercise together (per-rule reasoning currently lives in `docs/rules/`).
 The design separates two stages: reading the drawing (hard, ambiguous —
 done so far by reading the drawing directly, since no DXF/CAD tooling was
 available) and applying the rules (simple, deterministic, unit-tested per
-rule). A `data/plans/` folder holding structured JSON extracted from each
-drawing — the contract between the two stages — is planned but not built
-yet; each rule is currently tested against values transcribed directly
-from the drawing in its own test file and `docs/rules/*.md` entry.
+rule). There is no shared extracted-drawing-data file yet; each rule is
+currently tested against values transcribed directly from the drawing in
+its own test file and `docs/rules/*.md` entry.
 
 - **`data/rules/`** — one JSON file per rule: the rule text, how it was
   interpreted, the rule card's own sample scenarios, and every open

@@ -16,7 +16,7 @@
 // but has never been run against a real API key.
 //
 // To run for real: set ANTHROPIC_API_KEY, then
-//   npx tsx src/extraction/vision-extract-ic-mh.ts path/to/plan-crop.png
+//   node src/extraction/vision-extract-ic-mh.ts path/to/plan-crop.png
 
 import { readFileSync } from "node:fs";
 import Anthropic from "@anthropic-ai/sdk";
@@ -108,7 +108,7 @@ export async function extractIcMhPair(imagePath: string): Promise<IcMhPair> {
   };
 }
 
-// CLI entry point: `npx tsx src/extraction/vision-extract-ic-mh.ts <image>`
+// CLI entry point: `node src/extraction/vision-extract-ic-mh.ts <image>`
 if (import.meta.url === `file://${process.argv[1]}`) {
   const imagePath = process.argv[2];
   if (!imagePath) {
