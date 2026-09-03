@@ -1,0 +1,45 @@
+{
+  "ruleId": "SSW Annex A (c)",
+  "name": "Provision of removable trench cover",
+  "handbook": "Code of Practice on Sewerage and Sanitary Works",
+  "edition": "2nd Edition - January 2019",
+  "editionNote": "This rule card cites the 2nd Edition (Jan 2019) while the other Annex A rules cite the 3rd Edition (March 2025). Possible sign this rule wasn't updated in the 3rd Edition, or the card is stale -- flagged for the reviewer rather than assumed either way.",
+  "section": "Annex A - Requirements for Construction of RC Trench",
+  "sourceFile": "Capability Testing Pack/Annex A - The rules/SSW Annex A (c).docx",
+  "description": "Access into the trench shall be from the top of the trench. The trench shall be covered with removable slabs or other hard covers with lifting feature.",
+  "interpretation": {
+    "targetElement": "RC Trench specifically -- see elementType gate below",
+    "checkedProperties": {
+      "elementType": "string, must read as 'RC Trench' (case-insensitive) for the rule to apply at all",
+      "coverPresent": "boolean",
+      "coverRemovable": "boolean",
+      "coverHasLiftingFeature": "boolean"
+    },
+    "verdictLogic": "NEEDS_REVIEW if elementType is missing or is not 'RC Trench' -- this rule's text and title are specific to trenches, and applying it to a different element type is an assumption, not a read. Otherwise: COMPLIANT only if coverPresent AND coverRemovable AND coverHasLiftingFeature; any single failure is NON_COMPLIANT."
+  },
+  "elementTypeGateDecision": "The sample drawings never show an element explicitly labelled 'RC Trench' with cover details -- only 'RC Sump' elements with a removable M/S grating cover. Considered treating RC Sump as equivalent to RC Trench for this rule (same top-access, removable-cover logic), but decided against it: the three Annex A rules (a/b/c) together form one coherent set specifically about RC Trench construction, so 'trench' is likely an intentionally specific term, not interchangeable with 'sump' -- a trench protects a running pipe over a length, a sump is a compact collection point, and each may have different construction standards we don't have visibility into (e.g. a trench cover might need to bear vehicle loads a sump cover doesn't). Silently substituting one for the other risks a false-positive compliance verdict. Chose to gate on elementType and return NEEDS_REVIEW for anything not explicitly 'RC Trench', per the brief's own guidance to flag uncertainty rather than guess.",
+  "sampleScenarios": [
+    {
+      "id": "01-compliant",
+      "description": "Minor sewer is provided with trench and removable cover on top, with lifting feature.",
+      "expectedVerdict": "COMPLIANT",
+      "expectedMessage": "Trench cover is provided. Trench cover is removable with lifting feature."
+    },
+    {
+      "id": "01-non-compliant-1",
+      "description": "No trench cover is provided.",
+      "expectedVerdict": "NON_COMPLIANT",
+      "expectedMessage": "Trench cover is not provided."
+    },
+    {
+      "id": "01-non-compliant-2",
+      "description": "The trench cover is not removable with lifting feature.",
+      "expectedVerdict": "NON_COMPLIANT",
+      "expectedMessage": "Trench cover is not removable with lifting feature."
+    }
+  ],
+  "matchedPlanElement": {
+    "drawing": "(DXC x PUB) 1.2.1b, 1.1.3a, 1.2.4a, 1.2.4b, 4.2.1 (div) -sanitised (4).dwg",
+    "note": "Two 'RC Sump w/ removable M/S grating cover' elements found on the plan. Per the elementTypeGateDecision above, these are NOT adjudicated as RC Trench covers -- they resolve to NEEDS_REVIEW."
+  }
+}
