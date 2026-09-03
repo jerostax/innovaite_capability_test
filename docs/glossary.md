@@ -14,6 +14,9 @@ it — so the reasoning behind each reading is traceable later.
 | **TL** | Top Level — the elevation (in metres) of the top of a chamber/manhole cover. | "EXT'G T.L. 110.230", "NEW T.L. 110.460" |
 | **IL** | Invert Level — the elevation of the inside bottom of a pipe or chamber (where the water actually flows). | "EXT'G I.L. 109.230" |
 | **FFL** | Finished Floor Level — the elevation of the completed building's floor. | "TL TO BE TOPPED UP TO MATCH FFL" |
+| **RC** | Reinforced Concrete — concrete strengthened with internal steel bars. | "RC TRENCH", "RC SUMP" |
+| **M/S** | Mild Steel — a common structural steel grade. | "REMOVABLE M/S GRATING COVER" |
+| **Grating** | A mesh/grid-pattern cover (lets water/air through), as opposed to a solid slab. | "REMOVABLE M/S GRATING COVER" |
 
 ## Why this matters
 
