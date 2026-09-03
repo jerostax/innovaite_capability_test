@@ -1,0 +1,9 @@
+{
+  "name": "innovaite-capability-test",
+  "version": "0.1.0",
+  "description": "AI-enabled compliance review of sewerage/sanitary works plans against the Code of Practice on Sewerage and Sanitary Works. Built incrementally, one rule at a time, with reasoning documented in docs/ alongside the code.",
+  "type": "module",
+  "scripts": {
+    "test": "node --test tests/ssw-1-2-1-b.test.js"
+  }
+}

@@ -1,0 +1,24 @@
+{
+  "ruleId": "SSW 1.2.1 (b)",
+  "name": "Top level of manhole to inspection chamber",
+  "handbook": "Code of Practice on Sewerage and Sanitary Works",
+  "edition": "3rd Edition - March 2025",
+  "chapter": "1 Planning for Development Works",
+  "section": "1.2 Technical Considerations",
+  "sourceFile": "Capability Testing Pack/Annex A - The rules/SSW 1.2.1 (b) Top level of manhole to inspection chamber.docx",
+  "description": "Top levels of Sanitary Drainage System shall be higher than the top level of the manholes to which the development connects.",
+  "interpretation": {
+    "targetElement": "DistributionChamberElement (Inspection Chamber) paired with the Manhole it connects to",
+    "checkedProperties": ["inspectionChamberTopLevel_m", "manholeTopLevel_m"],
+    "verdictLogic": "COMPLIANT if inspectionChamberTopLevel_m >= manholeTopLevel_m (equal is explicitly allowed per Scenario 01-Compliant-2 and Figure 02). NON_COMPLIANT if inspectionChamberTopLevel_m < manholeTopLevel_m."
+  },
+  "sampleScenarios": [
+    { "id": "01-compliant-1", "description": "Top level of IC is higher than top level of connecting MH.", "expectedVerdict": "COMPLIANT" },
+    { "id": "01-compliant-2", "description": "Top level of IC is the same as top level of connecting MH.", "expectedVerdict": "COMPLIANT" },
+    { "id": "02-non-compliant", "description": "Top level of IC is lower than top level of connecting MH.", "expectedVerdict": "NON_COMPLIANT" }
+  ],
+  "matchedPlanElement": {
+    "drawing": "(DXC x PUB) 1.2.1b, 1.1.3a, 1.2.4a, 1.2.4b, 4.2.1 (div) -sanitised (4).dwg",
+    "note": "See docs/rules/ssw-1.2.1-b-ic-mh-level.md for the full reasoning and the exact callouts these values were read from: EXG'T LAST IC new T.L. 110.460 vs EXG'T LAST MH new T.L. 110.450."
+  }
+}
