@@ -1,1 +1,4 @@
 node_modules/
+
+# Personal revision/study notes -- not part of the deliverable, never commit
+docs/revision/
