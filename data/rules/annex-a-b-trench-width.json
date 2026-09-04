@@ -1,0 +1,37 @@
+{
+  "ruleId": "SSW Annex A (b)",
+  "name": "Minimum RC trench width",
+  "handbook": "Code of Practice on Sewerage and Sanitary Works",
+  "edition": "3rd Edition - March 2025",
+  "section": "Annex A - Requirements for Construction of RC Trench",
+  "sourceFile": "Capability Testing Pack/Annex A - The rules/SSW Annex A (b).docx",
+  "description": "Table 11 - RC Trench Width. Minimum internal width of the trench depends on sewer depth and pipe nominal diameter.",
+  "interpretation": {
+    "targetElement": "RC Trench specifically -- see elementType gate in src/rules/types.ts (requireElementType), same as Annex A(a)/(c)",
+    "inputs": ["sewerDepth_mm", "sewerNominalDiameter_mm", "haunchingThickness_mm", "trenchWidth_mm"],
+    "formula": {
+      "T_mm": "2 * haunchingThickness_mm + sewerNominalDiameter_mm",
+      "table": [
+        { "depth": "<= 3000 mm", "diameter": "<= 300 mm", "minWidth_mm": 750 },
+        { "depth": "<= 3000 mm", "diameter": "> 300 mm", "minWidth_mm": "900 + T" },
+        { "depth": "> 3000 mm", "diameter": "all sizes", "minWidth_mm": "900 + T", "note": "Source table cell was blank/merged ('See Figure 2'). ASSUMPTION: inherits the 900+T formula from the row above, regardless of diameter. No sample scenario at depth > 3m uses diameter <= 300mm, so this is UNTESTED against ground truth." }
+      ]
+    }
+  },
+  "openAmbiguities": [
+    "The rule card gives two different definitions of T in two places: the main table says 'T = 2 x haunching + diameter', but one 'Rule Scenario' requirement block says 'T = 900mm + (2 x Thickness of haunching) + nominal sewer diameter' (an extra '900mm +' folded into T's own definition). VERIFIED BY CALCULATION (not assumed): plugging Scenario 02-compliant's numbers (diameter 350mm, haunching 125mm, expected width 1500mm) into each definition -- the simple definition gives 900 + (2*125+350) = 1500mm, matching exactly; the definition with the extra 900 gives 900 + (900+2*125+350) = 2400mm, which does not match. The simple definition (main table) is the one used; the scenario text's extra '900mm +' is treated as a drafting/copy-paste error.",
+    "Scenarios 02-non-compliant and 03-non-compliant ('haunching not provided; width 1250mm') do not fail on arithmetic -- 900 + 2*0 + 350 = 1250mm, i.e. the built width exactly equals the zero-haunching minimum. They are still marked NON-COMPLIANT. Interpretation: once diameter > 300mm, the Code requires haunching thickness to be specified as part of the design -- its absence is a design/documentation failure, not a missing-data situation for us to flag as NEEDS_REVIEW. This is a deliberate departure from every other rule in this project (where missing data defaults to NEEDS_REVIEW): the distinction is between 'we failed to read a value that's on the drawing' (our extraction failure -> NEEDS_REVIEW) versus 'the drawing itself never specifies a value the Code requires it to specify' (a design failure -> NON_COMPLIANT). Diameter <= 300mm never needs haunching at all (flat 750mm rule), so this only applies once diameter > 300mm."
+  ],
+  "sampleScenarios": [
+    { "id": "01-compliant", "description": "Sewer depth 3000mm; pipe diameter 300mm; trench width 750mm.", "expectedVerdict": "COMPLIANT" },
+    { "id": "01-non-compliant", "description": "Sewer depth 3000mm; pipe diameter 300mm; trench width 700mm.", "expectedVerdict": "NON_COMPLIANT" },
+    { "id": "02-compliant", "description": "Sewer depth 3000mm; pipe diameter 350mm; haunching 125mm; trench width 1500mm.", "expectedVerdict": "COMPLIANT" },
+    { "id": "02-non-compliant", "description": "Sewer depth 3000mm; pipe diameter 350mm; haunching not provided; trench width 1250mm.", "expectedVerdict": "NON_COMPLIANT" },
+    { "id": "03-compliant", "description": "Sewer depth 3500mm; pipe diameter 350mm; haunching 125mm; trench width 1500mm.", "expectedVerdict": "COMPLIANT" },
+    { "id": "03-non-compliant", "description": "Sewer depth 3500mm; pipe diameter 350mm; haunching not provided; trench width 1250mm.", "expectedVerdict": "NON_COMPLIANT" }
+  ],
+  "matchedPlanElement": {
+    "drawing": "(DXC x PUB) 1.2.1b, 1.1.3a, 1.2.4a, 1.2.4b, 4.2.1 (div) -sanitised (4).dwg",
+    "note": "Same as Annex A(a)/(c): no element labelled 'RC Trench' found on the drawing, only 'RC Sump'. Resolves to NEEDS_REVIEW via the elementType gate before any width arithmetic is even attempted."
+  }
+}
