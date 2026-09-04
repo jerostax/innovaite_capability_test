@@ -8,15 +8,15 @@ interpretation and judgement call documented alongside the code.
 
 ## Status
 
-**2 of 5 rules implemented, tested, and documented.**
+**5 of 5 rules implemented, tested, and documented.**
 
 | Rule | Status |
 |---|---|
 | SSW 1.2.1(b) — IC top level vs. manhole top level | ✅ Done — verified against real values read off the sample drawing |
+| SSW Annex A(a) — Backfill material of RC trench | ✅ Done — resolves to `NEEDS_REVIEW` on the sample drawing (see below) |
+| SSW Annex A(b) — Minimum RC trench width | ✅ Done — two rule-card ambiguities resolved by calculation, not assumption |
 | SSW Annex A(c) — Removable trench cover | ✅ Done — resolves to `NEEDS_REVIEW` on the sample drawing (see below) |
-| SSW Annex A(a) — Backfill material of RC trench | ⏳ Not started |
-| SSW Annex A(b) — Minimum RC trench width | ⏳ Not started |
-| SSW 1.2.4(a) — No structure over/across a sewer | ⏳ Not started |
+| SSW 1.2.4(a) — No structure over/across a sewer | ✅ Done — the one geometric rule; engine built and tested, never run on real geometry (no DXF) |
 
 Not yet built: a report that runs all rules against the full extracted
 drawing data at once, and a consolidated write-up tying the whole
@@ -36,6 +36,12 @@ its own test file and `docs/rules/*.md` entry.
   ambiguity or judgement call, with reasoning.
 - **`src/rules/`** — one TypeScript module per rule: a pure `evaluate()`
   function, `RuleResult` in → `{ verdict, confidence, evidence, reasoning }` out.
+  `types.ts` also holds `requireElementType()`, a precondition shared by
+  the three Annex A rules (a/b/c) — extracted once duplication showed up,
+  rather than copy-pasted three times.
+- **`src/geometry/`** — 2D geometry helpers (point/segment/polygon
+  distance, polyline/polygon intersection) used by the one rule that's
+  spatial (SSW 1.2.4(a)) rather than a label/value lookup.
 - **`src/extraction/`** — a vision-based extraction script (calls the
   Claude API on a drawing image, returns structured data). Written and
   type-checked, deliberately never executed — see
@@ -44,7 +50,7 @@ its own test file and `docs/rules/*.md` entry.
   it, exactly where its values were read on the drawing, and every
   interpretation choice made, with justification.
 - **`docs/glossary.md`** — every CAD/drawing abbreviation decoded as it
-  was encountered (IC, MH, TL, IL, FFL, RC, M/S, ...).
+  was encountered (IC, MH, TL, IL, FFL, RC, M/S, PUB, ...).
 - **`docs/design-decisions.md`** — cross-cutting choices that apply to
   more than one rule (confidence scoring, the extraction-method hierarchy
   actually tried, why the vision script was never run against a real key).
@@ -59,18 +65,33 @@ npm run typecheck # tsc --noEmit — Node runs .ts files natively (no build
                   # step), this is a separate, real type-check
 ```
 
-## A worked example: what "documented reasoning" looks like here
+## Worked examples: what "documented reasoning" looks like here
 
-Rule SSW 1.2.1(b) requires an inspection chamber's top level to be at or
+**SSW 1.2.1(b)** requires an inspection chamber's top level to be at or
 above the manhole it connects to (gravity flow). The sample drawing labels
 both directly: IC new top level 110.460m, MH new top level 110.450m →
 **compliant**, 10mm margin. Full reasoning, including the "existing vs.
 new level" interpretation choice: `docs/rules/ssw-1.2.1-b-ic-mh-level.md`.
 
-Rule Annex A(c) requires a removable trench cover with a lifting feature.
+**Annex A(c)** requires a removable trench cover with a lifting feature.
 The sample drawing never shows an element labelled "RC Trench" — only
 "RC Sump" (a related but different element). Rather than assume the two
 are interchangeable, the rule checks the element's labelled type first and
 returns `NEEDS_REVIEW` if it isn't "RC Trench" — flagging the terminology
 mismatch for a human, instead of guessing. Full reasoning:
 `docs/rules/annex-a-c-trench-cover.md`.
+
+**Annex A(b)** (minimum trench width) has a rule card with two internal
+ambiguities — two different definitions of a formula variable, and sample
+scenarios where "missing data" is scored `NON_COMPLIANT` rather than
+`NEEDS_REVIEW`. Both were resolved by calculating against the rule card's
+own worked numeric examples rather than guessed. Full reasoning:
+`docs/rules/annex-a-b-trench-width.md`.
+
+**SSW 1.2.4(a)** (no structure over a sewer) is the only rule that's
+genuinely geometric — comparing shapes in space rather than reading a
+label. Its engine (`src/geometry/distance.ts`) is built and unit-tested,
+including a regression test for a real intersection-detection bug found
+while building it, but was never run against real drawing geometry: no
+DXF (vector CAD data) was ever obtainable in this environment. Full
+reasoning: `docs/rules/ssw-1.2.4-a-no-structure-over-sewer.md`.
