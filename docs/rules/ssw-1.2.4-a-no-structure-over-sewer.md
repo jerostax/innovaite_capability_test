@@ -59,26 +59,33 @@ screenshots reviewed.
 
 But "appears to, by eye, on a screenshot" is not a computed distance.
 Running this rule for real needs actual coordinates for both the sewer
-centerline and the building footprint, in the same coordinate space — and
-as documented in `docs/design-decisions.md`, **no DXF was ever obtained**
-for either sample drawing (no CAD software available, and the free DWG
-TrueView viewer doesn't export DXF). Rather than eyeball a verdict and
-report it as if it were computed, this resolves to `NEEDS_REVIEW`:
+centerline and the building footprint, in the same coordinate space.
 
-- The rule engine itself is fully built and unit-tested (18/18 tests
+**Update**: real DXF files now exist for both sample drawings (converted
+via ODA File Converter — see `docs/design-decisions.md`, "DXF extraction:
+parser vs. targeted search"), and they do contain `LWPOLYLINE` geometry
+(confirmed: 239 such entities in one sample drawing alone). What's
+missing isn't DXF access anymore — it's the specific step of identifying
+*which* polylines are the sewer centerline and the building footprint,
+and extracting their coordinates. `src/extraction/dxf-search.ts` only
+does text search; it doesn't read entity geometry. That's real, scoped,
+achievable follow-up work, not a blocked dependency. Rather than rush
+that extraction and risk a wrong pairing, this still resolves to
+`NEEDS_REVIEW` for now:
+
+- The rule engine itself is fully built and unit-tested (23/23 tests
   passing across all 5 rules, including this one, all against synthetic
   coordinates).
-- It has never run against real drawing geometry, because that geometry
-  was never obtainable in this environment.
-- If DXF access becomes available, this is the rule to prioritise
-  finishing — the hard part (the geometry engine) is already done and
-  tested; only the coordinate extraction is missing.
+- It has never run against real drawing geometry.
+- This is the rule to prioritise finishing next — the hard part (the
+  geometry engine) is already done and tested; only the coordinate
+  extraction is missing, and the tooling to do it now exists.
 
 ## Verdict
 
 ```
-sewerCenterline: not available (no DXF)
-buildingFootprint: not available (no DXF)
+sewerCenterline: not yet extracted from the real DXF
+buildingFootprint: not yet extracted from the real DXF
 → NEEDS_REVIEW
 ```
 

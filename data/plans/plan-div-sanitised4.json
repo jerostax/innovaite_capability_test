@@ -47,7 +47,7 @@
       "sewerCenterline": null,
       "buildingFootprint": null,
       "requiredSetback_m": 1,
-      "notes": "The plan draws an explicit '1M SEWER SETBACK LINE' next to the existing sewer, so requiredSetback_m=1 is known. sewerCenterline/buildingFootprint are null because no DXF (vector coordinates) was ever obtained for this drawing -- see docs/rules/ssw-1.2.4-a-no-structure-over-sewer.md. The building appears, by eye, to stay outside the setback line in the screenshots reviewed, but that is not a computed distance and is not reported as one."
+      "notes": "The plan draws an explicit '1M SEWER SETBACK LINE' next to the existing sewer, so requiredSetback_m=1 is known. sewerCenterline/buildingFootprint are still null: a real DXF now exists for this drawing (converted via ODA File Converter), and it does contain LWPOLYLINE geometry that dxf-parser-style tooling can read, but extracting the *specific* polylines for the sewer centerline and the building footprint (as opposed to reading text) has not been implemented yet -- see docs/rules/ssw-1.2.4-a-no-structure-over-sewer.md. Not a hard blocker anymore, just unfinished. The building appears, by eye, to stay outside the setback line in the screenshots reviewed, but that is not a computed distance and is not reported as one."
     }
   ]
 }

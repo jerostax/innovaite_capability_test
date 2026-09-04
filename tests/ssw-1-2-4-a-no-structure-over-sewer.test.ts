@@ -3,10 +3,12 @@ import assert from "node:assert/strict";
 
 import * as sewerSetbackRule from "../src/rules/ssw-1-2-4-a-no-structure-over-sewer.ts";
 
-// Synthetic coordinates -- no DXF was ever obtained for either sample
-// drawing (see docs/rules/ssw-1.2.4-a-no-structure-over-sewer.md), so this
-// rule's own sample scenarios ("a building near/over a sewer") can only be
-// tested with invented geometry, not real plan data.
+// Synthetic coordinates -- real DXF files exist for both sample drawings
+// (see docs/rules/ssw-1.2.4-a-no-structure-over-sewer.md), but extracting
+// the specific sewer-centerline/building-footprint polylines from them
+// hasn't been implemented, so this rule's own sample scenarios ("a
+// building near/over a sewer") are still tested with invented geometry,
+// not real plan data.
 
 test("SSW 1.2.4(a) - sample scenarios (synthetic geometry)", () => {
   const sewerCenterline = [{ x: 0, y: 0 }, { x: 100, y: 0 }];
@@ -54,7 +56,7 @@ test("SSW 1.2.4(a) - a sewer line passing through the building interior is caugh
   assert.equal(verdict, "NON_COMPLIANT");
 });
 
-test("SSW 1.2.4(a) - missing geometry (no DXF available) degrades to review", () => {
+test("SSW 1.2.4(a) - missing geometry (not yet extracted from DXF) degrades to review", () => {
   assert.equal(
     sewerSetbackRule.evaluate({
       sewerCenterline: null,
