@@ -120,18 +120,15 @@ reading and just eyeballed screenshots." That's not what happened, and it's
 worth being precise about the order of attempts, because each failure was
 a real, verified technical finding, not an assumption:
 
-1. **DXF (vector CAD data, exact text + coordinates)** -- never obtained.
-   No CAD software was available in the environment besides the free
+1. **DXF (vector CAD data, exact text + coordinates)** -- initially
+   thought unreachable: no CAD software was available besides the free
    Autodesk DWG TrueView viewer, which does not support DXF export (only
-   DWG-version conversion and DWF/DWFx/PDF export). This is the format
-   that would make extraction closest to mechanical/exact; its absence is
-   the single biggest limitation of this project.
-   **Not yet tried**: ODA File Converter, a free tool from the Open
-   Design Alliance built specifically for DWG↔DXF conversion (unlike DWG
-   TrueView, which is Autodesk's own viewer and deliberately omits DXF
-   export). This is a genuinely different tool, not another attempt with
-   the same one -- worth trying before treating DXF as permanently
-   unreachable.
+   DWG-version conversion and DWF/DWFx/PDF export). **Later obtained**
+   using **ODA File Converter**, a free tool from the Open Design
+   Alliance built specifically for DWG↔DXF conversion -- a genuinely
+   different tool from DWG TrueView, not another attempt with the same
+   one. Converted both sample drawings successfully. See "DXF extraction:
+   parser vs. targeted search" below for what was done with the result.
 2. **PDF text extraction (mechanically extracted, real embedded text, no
    vision involved)** -- attempted for both drawings; worked (non-blank)
    for one of the two (`Annex A - sanitised (2).pdf`), blank for the other
@@ -148,11 +145,61 @@ a real, verified technical finding, not an assumption:
    assumed** -- confirmed by reading the PDF's extracted text and searching
    it for the values we needed, and not finding them.
 3. **Vision reading of a rendered image (screenshot or PDF page render)**
-   -- the method that actually worked, and the one used for every value
-   recorded in `docs/rules/ssw-1.2.1-b-ic-mh-level.md`. Given step 2's verified result,
-   this wasn't a shortcut taken instead of "real" document reading -- it
-   was the only method of the three that could actually read this specific
-   layer of these specific drawings.
+   -- the method used for every value recorded in
+   `docs/rules/ssw-1.2.1-b-ic-mh-level.md`, at the time the only one of
+   the first three that could read this drawing layer at all. Superseded
+   by step 4 for anything findable by text search, but still the fallback
+   for whatever a raw text search can't find (e.g. reading a value off a
+   dimension line that has no text label).
+4. **DXF raw-text search** -- once real DXF files existed (step 1), this
+   became the most reliable method available: exact source text, not a
+   vision read of a raster image. See "DXF extraction: parser vs.
+   targeted search" below.
+
+## DXF extraction: parser vs. targeted search
+
+Once ODA File Converter produced two real DXF files, the natural next
+step seemed to be: install a DXF-parsing library and get a clean,
+structured list of every entity on the drawing. That was tried first,
+and abandoned in favor of something more modest but actually reliable --
+worth recording why, since it's a real example of a design choice
+changing mid-implementation based on evidence, not a plan followed blindly.
+
+**What went wrong with the library approach** (`dxf-parser` on npm):
+1. It doesn't support the `MLEADER` entity type -- and the callout
+   annotations this project actually needs (EXG'T LAST IC/MH, RC SUMP, RC
+   TRENCH) all turned out to be `MLEADER` objects, not plain `TEXT`/`MTEXT`.
+   Parsing a real sample drawing returned 208 TEXT/MTEXT entities, none
+   containing any string we knew was on the drawing -- confirmed
+   separately by grepping the raw DXF for the same terms.
+2. A first attempt to work around that by manually scanning for DXF group
+   code 304 (used for MLEADER content text) picked up **structural
+   noise** alongside real text -- group code 304 is reused inside MLEADER
+   objects for other sub-fields too (e.g. a literal string
+   `"LEADER_LINE{"` marking an internal sub-object, not annotation text),
+   so a blanket "collect everything after 304" approach mixed junk into
+   the results. **Caught with real numbers, not a suspicion**: cross-checking
+   the tool's output against known strings turned up gaps and noise that
+   didn't add up, which is what triggered digging into *why*.
+3. The package's own published TypeScript types were also inconsistent
+   with its actual runtime behavior (`import { DxfParser } from
+   "dxf-parser"` type-checked but threw `TypeError: DxfParser is not a
+   constructor` at runtime -- its `types` field points to a differently-shaped
+   file than its `main` field). A real bug in a third-party package,
+   confirmed by inspecting the installed module directly
+   (`require('dxf-parser')`), not assumed.
+
+**Decision**: drop the library dependency and the "parse every entity"
+ambition. Building a correct structured model of a DXF file's blocks,
+attribute definitions, and MLEADER internals is real, substantial,
+unscoped work -- a legitimate project on its own, not a side task. What
+this project actually needs is narrower: find specific known terms and
+read the text around them. `src/extraction/dxf-search.ts` does exactly
+that -- a `grep`-equivalent search over the DXF file's raw text (see
+`searchDxf()`), the same technique already validated by hand with the
+command-line `grep` tool while first investigating these drawings. It
+doesn't understand DXF structure at all, which is precisely why it isn't
+fooled by structure it doesn't need to understand.
 
 ## Why the vision extraction script was not run
 
