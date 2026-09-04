@@ -24,29 +24,14 @@ bottleneck.
 Before writing any rule code, all five rule cards and both sample
 drawings were read in full. Two things surfaced immediately:
 
-- **A handful of individual files sent before the official pack was
-  available had names that didn't match their content -- the official
-  "Capability Testing Pack" itself has always been internally consistent
-  and is not implicated.** Re-verified directly: a fresh copy of the
-  official pack, downloaded again from the recruiter just to check this,
-  has `Annex A - The rules/SSW 1.2.1 (b) Top level of manhole to
-  inspection chamber.docx` containing exactly `Rule ID: SSW 1.2.1 (b)` --
-  correct, as expected, no discrepancy. The mismatch was specific to an
-  earlier, separate delivery: four individual rule files sent directly in
-  conversation about 16 minutes before the official pack was located and
-  used from then on. One of those four, sharing that same filename, was
-  380,337 bytes and its actual content was Annex A(c) (trench cover) --
-  confirmed by reading it, and distinguishable from the correct 445,415-byte
-  file the official pack has under the identical name. Where those four
-  early files originated, or why they were mismatched, is not established
-  -- only that they were not sourced from the same official pack archive
-  re-verified here, and that every rule in this project was built from the
-  official pack's correct copies from the point that pack was located
-  onward. The lasting design decision doesn't depend on resolving that
-  origin question: the engine identifies a rule by the `Rule ID` field
-  read from inside the document, never by filename -- because a filename
-  was proven unreliable at least once in this project, not on principle
-  alone.
+- **Don't trust filenames to identify a rule -- read the `Rule ID` field
+  inside the document instead.** Before the official "Capability Testing
+  Pack" was available, a small number of individual files were received
+  whose names didn't match their actual content. The official pack itself
+  is internally consistent (verified directly) and every rule in this
+  project is built from it; the point stands regardless: a filename was
+  wrong at least once during this exercise, so the engine never keys off
+  one.
 - **The rule text and its own worked examples sometimes disagree with
   each other** (see Annex A(b) below). Worked numeric examples were
   treated as more reliable than prose, on the reasoning that a scenario
