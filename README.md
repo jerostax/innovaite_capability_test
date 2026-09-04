@@ -12,10 +12,10 @@ interpretation and judgement call documented alongside the code.
 
 | Rule | Status |
 |---|---|
-| SSW 1.2.1(b) — IC top level vs. manhole top level | ✅ Done — verified against real values read off the sample drawing |
-| SSW Annex A(a) — Backfill material of RC trench | ✅ Done — resolves to `NEEDS_REVIEW` on the sample drawing (see below) |
+| SSW 1.2.1(b) — IC top level vs. manhole top level | ✅ Done — **COMPLIANT** on drawing 1 (verified against real DXF values); `NEEDS_REVIEW` on drawing 2 (no paired manhole) |
+| SSW Annex A(a) — Backfill material of RC trench | ✅ Done — `NEEDS_REVIEW` on both sample drawings, for two different reasons (see below) |
 | SSW Annex A(b) — Minimum RC trench width | ✅ Done — two rule-card ambiguities resolved by calculation, not assumption |
-| SSW Annex A(c) — Removable trench cover | ✅ Done — resolves to `NEEDS_REVIEW` on the sample drawing (see below) |
+| SSW Annex A(c) — Removable trench cover | ✅ Done — `NEEDS_REVIEW` on both sample drawings, for two different reasons (see below) |
 | SSW 1.2.4(a) — No structure over/across a sewer | ✅ Done — the one geometric rule; engine built and tested, real geometry investigated and found genuinely hard to extract cleanly (see below) |
 
 **Start here**: [`docs/write-up.md`](docs/write-up.md) — the consolidated
@@ -76,7 +76,7 @@ entity type this project's key data lives in).
 ```bash
 npm install
 npm test         # runs every rule's tests: the rule card's own sample
-                  # scenarios, plus real values read off the sample drawing
+                  # scenarios, plus real values extracted from both drawings
 npm run typecheck # tsc --noEmit — Node runs .ts files natively (no build
                   # step), this is a separate, real type-check
 npm run adjudicate # runs all 5 rules against every data/plans/*.json
@@ -86,10 +86,12 @@ npm run adjudicate # runs all 5 rules against every data/plans/*.json
 ## Worked examples: what "documented reasoning" looks like here
 
 **SSW 1.2.1(b)** requires an inspection chamber's top level to be at or
-above the manhole it connects to (gravity flow). The sample drawing labels
-both directly: IC new top level 110.460m, MH new top level 110.450m →
-**compliant**, 10mm margin. Full reasoning, including the "existing vs.
-new level" interpretation choice: `docs/rules/ssw-1.2.1-b-ic-mh-level.md`.
+above the manhole it connects to (gravity flow). Drawing 1 labels both
+directly: IC new top level 110.460m, MH new top level 110.450m →
+**compliant**, 10mm margin. Drawing 2 has an inspection chamber but no
+unambiguous connecting manhole, so it resolves to `NEEDS_REVIEW` instead.
+Full reasoning, including the "existing vs. new level" interpretation
+choice: `docs/rules/ssw-1.2.1-b-ic-mh-level.md`.
 
 **Annex A(c)** requires a removable trench cover with a lifting feature.
 One sample drawing never shows an element labelled "RC Trench" — only
@@ -106,7 +108,9 @@ Full reasoning: `docs/rules/annex-a-c-trench-cover.md`.
 ambiguities — two different definitions of a formula variable, and sample
 scenarios where "missing data" is scored `NON_COMPLIANT` rather than
 `NEEDS_REVIEW`. Both were resolved by calculating against the rule card's
-own worked numeric examples rather than guessed. Full reasoning:
+own worked numeric examples rather than guessed. Drawing 2's real "RC
+Trench" gives a width directly (750mm), but not the depth/diameter this
+rule also needs, so it still resolves to `NEEDS_REVIEW`. Full reasoning:
 `docs/rules/annex-a-b-trench-width.md`.
 
 **SSW 1.2.4(a)** (no structure over a sewer) is the only rule that's
