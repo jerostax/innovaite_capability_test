@@ -1,0 +1,53 @@
+{
+  "id": "DXC-x-PUB-1.2.1b-1.1.3a-1.2.4a-1.2.4b-4.2.1-div-sanitised-4",
+  "sourceFile": "Capability Testing Pack/2D/(DXC x PUB) 1.2.1b, 1.1.3a, 1.2.4a, 1.2.4b, 4.2.1 (div) -sanitised (4).dwg",
+  "extractionMethod": "Manual visual reading of zoomed screenshots exported from Autodesk DWG TrueView. No DXF export was available (no CAD software beyond the free viewer, which doesn't support DXF export); PDF export was attempted and rendered blank for this specific file (screen-oriented plot style with invisible colors on white paper, not resolved). See docs/design-decisions.md, \"Extraction method hierarchy\", for the full attempt order and the verified finding that PDF text extraction (tried on the other sample drawing) does not contain this drawing layer's annotations at all.",
+  "extractionConfidence": "Values below were read by eye off the drawing's text callouts, not OCR'd or taken from vector coordinates. See docs/design-decisions.md \"Confidence scoring\" for what the per-verdict confidence numbers represent.",
+
+  "icMhPairs": [
+    {
+      "id": "IC-MH-101",
+      "label": "EXG'T LAST IC vs EXG'T LAST MH (near boundary/discharge area, plan callouts 101/102)",
+      "inspectionChamberTopLevel_m": 110.46,
+      "manholeTopLevel_m": 110.45,
+      "notes": "Both read from 'TL TO BE TOPPED UP' callout boxes on the plan. Used the NEW (proposed) top levels, not the existing ones -- see docs/rules/ssw-1.2.1-b-ic-mh-level.md for why."
+    }
+  ],
+
+  "trenches": [
+    {
+      "id": "SUMP-108",
+      "elementType": "RC Sump",
+      "label": "Outline of new RC Sump w/ removable M/S grating cover (at connection between existing neighbour's discharge point and new conduit drain)",
+      "backfillMaterial": null,
+      "sewerDepth_mm": null,
+      "sewerNominalDiameter_mm": null,
+      "haunchingThickness_mm": null,
+      "trenchWidth_mm": null,
+      "cover": { "present": true, "removable": true, "hasLiftingFeature": true },
+      "notes": "elementType is 'RC Sump', not 'RC Trench' -- every Annex A rule (a/b/c) gates on this and returns NEEDS_REVIEW before checking anything else. See docs/rules/annex-a-c-trench-cover.md 'The RC Trench vs. RC Sump decision'."
+    },
+    {
+      "id": "SUMP-1E",
+      "elementType": "RC Sump",
+      "label": "Outline of RC Sump w/ removable M/S grating cover (near point 1 / grid E)",
+      "backfillMaterial": null,
+      "sewerDepth_mm": null,
+      "sewerNominalDiameter_mm": null,
+      "haunchingThickness_mm": null,
+      "trenchWidth_mm": null,
+      "cover": { "present": true, "removable": true, "hasLiftingFeature": true },
+      "notes": "Same as SUMP-108."
+    }
+  ],
+
+  "buildingVsSewerChecks": [
+    {
+      "id": "SETBACK-CHECK-01",
+      "sewerCenterline": null,
+      "buildingFootprint": null,
+      "requiredSetback_m": 1,
+      "notes": "The plan draws an explicit '1M SEWER SETBACK LINE' next to the existing sewer, so requiredSetback_m=1 is known. sewerCenterline/buildingFootprint are null because no DXF (vector coordinates) was ever obtained for this drawing -- see docs/rules/ssw-1.2.4-a-no-structure-over-sewer.md. The building appears, by eye, to stay outside the setback line in the screenshots reviewed, but that is not a computed distance and is not reported as one."
+    }
+  ]
+}

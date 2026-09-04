@@ -5,7 +5,8 @@
   "type": "module",
   "scripts": {
     "test": "node --test",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "adjudicate": "node src/adjudicate.ts"
   },
   "devDependencies": {
     "@types/node": "^26.4.1",

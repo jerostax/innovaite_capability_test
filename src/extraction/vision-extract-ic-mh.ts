@@ -109,7 +109,12 @@ export async function extractIcMhPair(imagePath: string): Promise<IcMhPair> {
 }
 
 // CLI entry point: `node src/extraction/vision-extract-ic-mh.ts <image>`
-if (import.meta.url === `file://${process.argv[1]}`) {
+// `file://${argv[1]}` breaks on Windows (backslashes, no leading slash) --
+// pathToFileURL() builds a correct file: URL on every platform. Caught
+// while wiring up src/adjudicate.ts's own copy of this same pattern; see
+// docs/design-decisions.md.
+import { pathToFileURL } from "node:url";
+if (import.meta.url === pathToFileURL(process.argv[1] ?? "").href) {
   const imagePath = process.argv[2];
   if (!imagePath) {
     console.error("Usage: vision-extract-ic-mh.ts <path-to-drawing-crop.png>");
