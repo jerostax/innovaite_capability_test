@@ -99,10 +99,20 @@ with *how the value was obtained*:
 
 | Extraction method | Reliability | Example |
 |---|---|---|
-| Read from real vector CAD data (DXF text entities, exact coordinates) | Highest -- mechanical, no ambiguity | Not available in this project (no DXF, see below) |
-| Read by a human (or a human-directed AI assistant) off a clearly labelled callout box, at good zoom | High but not perfect -- a label can still be misread | `SSW 1.2.1(b)`, IC/MH top levels, `confidence: 0.9` |
+| Read from real vector CAD data (DXF exact source text, via `dxf-search.ts`) | Highest -- mechanical, no ambiguity | Every value in `data/plans/plan-annexA-sanitised2.json`; `plan-div-sanitised4.json`'s values, cross-checked against DXF and confirmed exact |
+| Read by a human (or a human-directed AI assistant) off a clearly labelled callout box, at good zoom | High but not perfect -- a label can still be misread | How `plan-div-sanitised4.json`'s values were *originally* read, before DXF was available |
 | Inferred/assumed rather than read (e.g. "a grating cover implies a lifting feature") | Lower -- it's a judgement call, not a read | Annex A(c) cover rule applied to an "RC Sump" |
 | Not found on the drawing at all | None | `NEEDS_REVIEW`, `confidence: 0` (hardcoded in `needsReview()`) |
+
+**Known gap this table exposes**: the actual `confidence` numbers each
+rule's `evaluate()` returns (e.g. `0.9` for SSW 1.2.1(b)) are still fixed
+per rule, not per extraction method -- the code doesn't yet distinguish
+"this value came from DXF" from "this value came from a screenshot" at
+the point a verdict is produced, even though the table above says it
+should. Confidence is now *more* trustworthy in practice than the hardcoded
+numbers claim (DXF-sourced data is exact), but that hasn't been wired
+through the type system -- an honest limitation, not silently fixed by
+having better data available.
 
 **Honest limitation**: the specific number (e.g. `0.9` rather than `0.85`)
 is a hand-picked estimate, not a calibrated probability -- there is no
