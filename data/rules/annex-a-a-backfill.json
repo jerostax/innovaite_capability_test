@@ -1,0 +1,40 @@
+{
+  "ruleId": "SSW Annex A (a)",
+  "name": "Backfill material of RC trench",
+  "handbook": "Code of Practice on Sewerage and Sanitary Works",
+  "edition": "3rd Edition - March 2025",
+  "section": "Annex A - Requirements for Construction of RC Trench",
+  "sourceFile": "Capability Testing Pack/Annex A - The rules/SSW Annex A (a).docx",
+  "description": "The RC trench shall comply with the following requirements: It shall be backfilled with sand or other approved granular material.",
+  "interpretation": {
+    "targetElement": "RC Trench specifically -- see elementType gate in src/rules/types.ts (requireElementType), same as Annex A(c)",
+    "checkedProperty": "backfillMaterial",
+    "allowedValues": [
+      "sand",
+      "corey dust",
+      "granite dust",
+      "gravel",
+      "crusher run",
+      "recycled aggregates"
+    ],
+    "verdictLogic": "NEEDS_REVIEW if elementType isn't 'RC Trench' (see Annex A(c) reasoning -- same terminology gap applies here). Otherwise NEEDS_REVIEW if no backfill material was read. Otherwise COMPLIANT if the material is in the approved list, NON_COMPLIANT if not."
+  },
+  "sampleScenarios": [
+    {
+      "id": "01-compliant",
+      "description": "Sand is used as the backfill material inside of RC trench.",
+      "expectedVerdict": "COMPLIANT",
+      "expectedMessage": "RC trench Backfill material: Sand"
+    },
+    {
+      "id": "01-non-compliant",
+      "description": "Soil is used as the backfill material inside of RC trench.",
+      "expectedVerdict": "NON_COMPLIANT",
+      "expectedMessage": "RC trench Backfill material: Soil"
+    }
+  ],
+  "matchedPlanElement": {
+    "drawing": "(DXC x PUB) 1.2.1b, 1.1.3a, 1.2.4a, 1.2.4b, 4.2.1 (div) -sanitised (4).dwg",
+    "note": "Same two 'RC Sump' elements as Annex A(c). Neither is labelled 'RC Trench', and neither has a backfill material annotated anywhere on the drawing -- this rule resolves to NEEDS_REVIEW for a compounded reason: wrong element type AND missing data, either one of which alone would already be enough."
+  }
+}
