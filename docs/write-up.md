@@ -24,13 +24,25 @@ bottleneck.
 Before writing any rule code, all five rule cards and both sample
 drawings were read in full. Two things surfaced immediately:
 
-- **Filenames didn't match rule contents.** The rule files as originally
-  received had names like `SSW 1.2.1 (b) Top level of manhole to
-  inspection chamber.docx`, but that file's actual content was Annex A(c)
-  (trench cover) — verified against the correctly-named copies in the
-  official "Capability Testing Pack" by file size. The engine identifies a
-  rule by the `Rule ID` field read from inside the document, never by
-  filename.
+- **Filenames didn't match rule contents -- in the very first files sent,
+  before the official pack was located.** One file, sent standalone
+  ahead of the official "Capability Testing Pack," was named `SSW 1.2.1
+  (b) Top level of manhole to inspection chamber.docx` but its actual
+  content was Annex A(c) (trench cover). This was NOT a property of the
+  rule cards themselves -- the correctly-named copy of the same filename
+  inside the official "Capability Testing Pack" (`Annex A - The rules/SSW
+  1.2.1 (b) Top level of manhole to inspection chamber.docx`) has the
+  right content (confirmed: `Rule ID: SSW 1.2.1 (b)`, matching its own
+  filename exactly) and is the one this project actually uses throughout.
+  The two files share a name but are different files -- proven by
+  comparing byte size (380,337 bytes for the mismatched one sent first vs.
+  445,415 bytes for the correct one in the official pack) and by reading
+  both. Once the official pack was available, every rule was sourced from
+  it. The lasting design decision, though, is unaffected by which specific
+  copy was mislabeled: the engine identifies a rule by the `Rule ID` field
+  read from inside the document, never by filename -- because a filename
+  was proven unreliable once, in this exact project, not on principle
+  alone.
 - **The rule text and its own worked examples sometimes disagree with
   each other** (see Annex A(b) below). Worked numeric examples were
   treated as more reliable than prose, on the reasoning that a scenario
