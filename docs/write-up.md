@@ -25,7 +25,37 @@ identifies a rule by filename, only by the `Rule ID` field inside the
 document — general defensive practice, not a reaction to a specific
 incident.
 
+**Scope note**: the brief frames the general problem around distances,
+alignment, gradient/slope, connectivity, and direction of flow, and
+mentions three Codes of Practice (Surface Water Drainage; Sewerage and
+Sanitary Works; SS 636:2018 Water Services). The five rules actually
+provided are narrower than that: all five cite the Sewerage and Sanitary
+Works code specifically, and none of them requires a gradient/slope
+calculation — mostly level comparisons, a width formula, and one
+distance/intersection check. Connectivity shows up once, directly (SSW
+1.2.1(b) needs to know *which* manhole an inspection chamber connects
+to, and drawing 2 doesn't make that unambiguous — see below). This
+project adjudicates the rules it was actually given; it doesn't claim
+coverage of gradient/slope logic or the other two codes, since nothing in
+the provided material exercised them.
+
 ## 2. The five rules — results on both sample drawings
+
+**Assumptions, at a glance** (each detailed in its rule's own doc):
+- SSW 1.2.1(b): compared the drawing's *new/proposed* levels, not the
+  existing ones — the rule governs what will be built.
+- Annex A(b): resolved the rule card's own conflicting T-formula to the
+  simpler definition (verified against its worked example, not guessed).
+- Annex A(b): assumed the blank ">3m, all sizes" table row inherits the
+  `900+T` formula from the row above — untested against any sample
+  scenario.
+- Annex A(b): once diameter exceeds 300mm, absent haunching data is
+  scored `NON_COMPLIANT` (a design gap), not `NEEDS_REVIEW` (an
+  extraction gap) — a deliberate exception to this project's usual
+  missing-data default.
+- Annex A(a)/(b)/(c): treated "RC Sump" as **not** interchangeable with
+  the rule text's "RC Trench" — different construction standards may
+  apply, so the type mismatch is flagged rather than assumed away.
 
 Full reasoning and traceability per rule: `docs/rules/*.md`.
 
