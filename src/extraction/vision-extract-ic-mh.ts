@@ -2,13 +2,20 @@
 // returns the top levels of a paired Inspection Chamber (IC) and Manhole (MH),
 // ready to feed straight into src/rules/ssw-1-2-1-b-ic-mh-top-level.ts.
 //
-// This is not a fallback taken out of convenience: DXF was never available,
-// and PDF text extraction was verified to NOT contain this drawing layer's
-// annotations at all (see docs/design-decisions.md, "Extraction method
-// hierarchy") -- vision is the only one of the three methods tried that can
-// actually read this layer. This script automates that reading step as an
-// actual, callable, testable component, replacing the manual "read it in a
-// chat conversation" process used for the rest of this project.
+// SUPERSEDED as the primary extraction path: at the time this was written,
+// DXF was unobtainable and PDF text extraction was verified to NOT contain
+// this drawing layer's annotations -- vision was the only method tried
+// that could read this layer at all. That has since changed: real DXF
+// files now exist for both sample drawings (via ODA File Converter), and
+// src/extraction/dxf-search.ts reads their exact source text -- including
+// this exact IC/MH data -- more reliably and for free (no API cost). See
+// docs/design-decisions.md, "Extraction method hierarchy" and "DXF
+// extraction: parser vs. targeted search", for the full history.
+//
+// Still a legitimate, documented fallback for whatever DXF text search
+// can't cover: a drawing with no DXF available at all, or a value that's
+// only shown graphically (e.g. read off a dimension line) with no text
+// label a text search could ever find.
 //
 // NOT EXECUTED as part of this project (see docs/design-decisions.md,
 // "Why the vision extraction script was not run") -- it compiles and

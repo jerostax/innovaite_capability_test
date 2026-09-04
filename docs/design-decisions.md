@@ -205,9 +205,12 @@ fooled by structure it doesn't need to understand.
 
 `src/extraction/vision-extract-ic-mh.ts` calls the Claude API with an image
 of the drawing and a Zod schema, and returns structured data ready for the
-rule engine -- this is what an actual automated pipeline would look like,
-replacing the manual "read the screenshot in a chat conversation" step used
-everywhere else in this project.
+rule engine. **Written when vision reading was the most reliable method
+available**; that's since changed (see "Extraction method hierarchy"
+above) -- `src/extraction/dxf-search.ts` now does the actual, reliable,
+free extraction for both drawings. This script is kept as a documented
+fallback for what text search can't cover, not the primary pipeline
+anymore.
 
 It was **written and type-checked, but never executed against the real
 API**. Reason: using the Anthropic API requires loading paid credits onto
@@ -224,10 +227,12 @@ This is a deliberate, documented choice, not a silent gap:
 - It was **not** run, so its output has never been observed -- unlike every
   other rule's tests, there is no "verified against real output" claim
   here, only "verified to compile against the documented API shape."
-- The system's actual working end-to-end result (see
-  `docs/rules/ssw-1.2.1-b-ic-mh-level.md`) came from manually reading the
-  drawing in conversation -- free, since it reused an already-available AI
-  assistant session, but not a reproducible, standalone software component.
+- The system's actual working end-to-end result for SSW 1.2.1(b) (see
+  `docs/rules/ssw-1.2.1-b-ic-mh-level.md`) started as a manual reading of
+  the drawing in conversation, and has since been independently
+  cross-checked against the real DXF's exact source text via
+  `dxf-search.ts` -- it matches exactly, and the DXF read is now the more
+  reliable, reproducible source of the two.
 
 **What this is worth pointing out in the interview**: knowing when *not* to
 spend money to finish a demo is itself an engineering judgement call, not
