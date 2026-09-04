@@ -18,19 +18,23 @@ interpretation and judgement call documented alongside the code.
 | SSW Annex A(c) — Removable trench cover | ✅ Done — resolves to `NEEDS_REVIEW` on the sample drawing (see below) |
 | SSW 1.2.4(a) — No structure over/across a sewer | ✅ Done — the one geometric rule; engine built and tested, never run on real geometry (no DXF) |
 
-Not yet built: a report that runs all rules against the full extracted
-drawing data at once, and a consolidated write-up tying the whole
-exercise together (per-rule reasoning currently lives in `docs/rules/`).
+**Start here**: [`docs/write-up.md`](docs/write-up.md) — the consolidated
+write-up (problem framing, all 5 rules summarized, the extraction methods
+actually tried, limitations, and how this was built with Claude Code).
+`npm run adjudicate` runs all 5 rules against the real extracted drawing
+data (`data/plans/plan-div-sanitised4.json`) and prints a report.
 
 ## How this project is organized
 
 The design separates two stages: reading the drawing (hard, ambiguous —
 done so far by reading the drawing directly, since no DXF/CAD tooling was
 available) and applying the rules (simple, deterministic, unit-tested per
-rule). There is no shared extracted-drawing-data file yet; each rule is
-currently tested against values transcribed directly from the drawing in
-its own test file and `docs/rules/*.md` entry.
+rule), connected by `data/plans/*.json` — one file per drawing, holding
+everything actually extracted from it, consumed by `src/adjudicate.ts`.
 
+- **`data/plans/`** — one JSON file per sample drawing: every element
+  extracted from it (with per-field notes on why a value is present or
+  null), consumed by `src/adjudicate.ts`.
 - **`data/rules/`** — one JSON file per rule: the rule text, how it was
   interpreted, the rule card's own sample scenarios, and every open
   ambiguity or judgement call, with reasoning.
@@ -63,6 +67,8 @@ npm test         # runs every rule's tests: the rule card's own sample
                   # scenarios, plus real values read off the sample drawing
 npm run typecheck # tsc --noEmit — Node runs .ts files natively (no build
                   # step), this is a separate, real type-check
+npm run adjudicate # runs all 5 rules against data/plans/plan-div-sanitised4.json
+                  # and prints a report
 ```
 
 ## Worked examples: what "documented reasoning" looks like here
