@@ -26,10 +26,14 @@ ELSE:
 
 ## The RC Trench vs. RC Sump decision
 
-Neither sample drawing shows an element explicitly labelled **"RC Trench"**
-with cover details. What both drawings repeatedly show instead is an
-**"RC Sump w/ removable M/S grating cover"** — see
-[glossary.md](../glossary.md) for what RC, M/S, and grating mean.
+The one drawing that was fully processed (`(div) -sanitised (4).dwg`)
+doesn't show an element explicitly labelled **"RC Trench"** with cover
+details — it repeatedly shows an **"RC Sump w/ removable M/S grating
+cover"** instead — see [glossary.md](../glossary.md) for what RC, M/S,
+and grating mean. The second sample drawing (`Annex A - sanitised
+(2).dwg`) was never fully processed (see `docs/write-up.md`, Section 5),
+so whether it contains an "RC Trench" is unresolved, not ruled out — this
+decision is based on the one drawing actually checked.
 
 An RC Trench and an RC Sump are physically different things: a trench is a
 long, narrow channel that protects a *running* pipe over a length; a sump

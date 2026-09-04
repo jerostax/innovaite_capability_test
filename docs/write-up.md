@@ -53,9 +53,12 @@ rule: `docs/rules/*.md`. Summary of the interesting decisions:
 
 **The RC Trench vs. RC Sump decision**, made once and reused (via a
 shared `requireElementType()` precondition) across Annex A(a)/(b)/(c):
-neither sample drawing shows an element explicitly labelled "RC Trench"
-with construction details — both repeatedly show "RC Sump w/ removable
-M/S grating cover" instead, a related but physically different element (a
+the one drawing that was fully processed doesn't show an element
+explicitly labelled "RC Trench" with construction details — it repeatedly
+shows "RC Sump w/ removable M/S grating cover" instead. (The second
+drawing was never fully processed — see Section 5 — so whether it
+contains an "RC Trench" is unresolved, not ruled out.) RC Trench and RC
+Sump are a related but physically different element (a
 trench protects a *running* pipe over a length; a sump is a *compact*
 collection point, and may carry different construction standards not
 visible in this sample). Rather than assume the two are interchangeable
@@ -139,15 +142,24 @@ defend every decision, not just that the code runs.
 - **No DXF** was ever obtained for either sample drawing — the single
   biggest limitation. Exact geometric extraction (needed for SSW 1.2.4(a)
   in particular) isn't possible without it.
+- **Only 1 of the 2 sample drawings was extracted into structured data**
+  (`data/plans/plan-div-sanitised4.json`). The second
+  (`Annex A - sanitised (2).dwg`) was reviewed manually and appeared, at
+  one point, to reference an "RC Trench"/"RC Sump" area, but that
+  specific callout was never re-located with confidence within the time
+  available, and nothing from it was extracted. This is a real scope gap,
+  not a claim that both drawings were fully processed.
 - **The geometric rule was never tested against real drawing data.** Its
   engine is complete and unit-tested against synthetic coordinates
   (including a regression test for a real intersection-detection bug
   found while building it — see `docs/rules/ssw-1.2.4-a-no-structure-over-sewer.md`),
   ready to run the moment real coordinates are available.
-- **No "RC Trench" construction section was found anywhere in the sample
-  drawings** — only "RC Sump", a related but different element. Three of
-  the five rules resolve to `NEEDS_REVIEW` on this drawing specifically
-  because of that gap, not because the rule logic itself is incomplete.
+- **No "RC Trench" construction section was found in the one drawing that
+  was fully processed** — only "RC Sump", a related but different
+  element. Whether the second, unprocessed drawing contains one is
+  unresolved, not ruled out. Three of the five rules resolve to
+  `NEEDS_REVIEW` because of this gap, not because the rule logic itself
+  is incomplete.
 - **The vision-extraction API script has never been run** for real (see
   `docs/design-decisions.md` for the cost reasoning) — it's written and
   type-checked against the current Anthropic SDK's documented patterns,

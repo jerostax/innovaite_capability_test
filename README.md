@@ -29,12 +29,17 @@ data (`data/plans/plan-div-sanitised4.json`) and prints a report.
 The design separates two stages: reading the drawing (hard, ambiguous —
 done so far by reading the drawing directly, since no DXF/CAD tooling was
 available) and applying the rules (simple, deterministic, unit-tested per
-rule), connected by `data/plans/*.json` — one file per drawing, holding
-everything actually extracted from it, consumed by `src/adjudicate.ts`.
+rule), connected by `data/plans/*.json` — one file per drawing that's
+actually been extracted, holding everything found in it, consumed by
+`src/adjudicate.ts`.
 
-- **`data/plans/`** — one JSON file per sample drawing: every element
-  extracted from it (with per-field notes on why a value is present or
-  null), consumed by `src/adjudicate.ts`.
+- **`data/plans/`** — currently **1 of the 2** sample drawings:
+  `plan-div-sanitised4.json`. The second drawing
+  (`Annex A - sanitised (2).dwg`) was explored (it appeared to reference
+  an "RC Trench"/"RC Sump" area during manual review) but no element on
+  it was confidently pinned down and extracted within the time available
+  — recorded as a scope limitation in `docs/write-up.md`, not silently
+  dropped.
 - **`data/rules/`** — one JSON file per rule: the rule text, how it was
   interpreted, the rule card's own sample scenarios, and every open
   ambiguity or judgement call, with reasoning.
