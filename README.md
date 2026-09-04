@@ -16,7 +16,7 @@ interpretation and judgement call documented alongside the code.
 | SSW Annex A(a) — Backfill material of RC trench | ✅ Done — resolves to `NEEDS_REVIEW` on the sample drawing (see below) |
 | SSW Annex A(b) — Minimum RC trench width | ✅ Done — two rule-card ambiguities resolved by calculation, not assumption |
 | SSW Annex A(c) — Removable trench cover | ✅ Done — resolves to `NEEDS_REVIEW` on the sample drawing (see below) |
-| SSW 1.2.4(a) — No structure over/across a sewer | ✅ Done — the one geometric rule; engine built and tested, real DXF geometry now available but not yet wired in (see below) |
+| SSW 1.2.4(a) — No structure over/across a sewer | ✅ Done — the one geometric rule; engine built and tested, real geometry investigated and found genuinely hard to extract cleanly (see below) |
 
 **Start here**: [`docs/write-up.md`](docs/write-up.md) — the consolidated
 write-up (problem framing, all 5 rules summarized, the extraction methods
@@ -113,11 +113,14 @@ own worked numeric examples rather than guessed. Full reasoning:
 genuinely geometric — comparing shapes in space rather than reading a
 label. Its engine (`src/geometry/distance.ts`) is built and unit-tested,
 including a regression test for a real intersection-detection bug found
-while building it. Real DXF geometry now exists for both drawings, but
-extracting the *specific* sewer-centerline/building-footprint polylines
-from it (as opposed to the text search everything else in this project
-uses) hasn't been implemented — a scoped follow-up, not a blocked
-dependency. Full reasoning: `docs/rules/ssw-1.2.4-a-no-structure-over-sewer.md`.
+while building it. Real DXF geometry now exists for both drawings, and
+extracting real coordinates from it was investigated (not just assumed
+possible): the building has no single outline (walls exist as ~28
+disjoint rectangles across several layers), and the layer that looked
+like the sewer turned out to be a stray/mislabelled block reference at
+an implausible position, not the real sewer line. Genuine CAD-data
+reconstruction work, not a quick wiring step. Full reasoning:
+`docs/rules/ssw-1.2.4-a-no-structure-over-sewer.md`.
 
 **The second drawing** (`Annex A - sanitised (2).dwg`) was searched for
 by screenshot early in the project and given up on — the search was

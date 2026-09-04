@@ -51,7 +51,7 @@ rule: `docs/rules/*.md`. Verdicts against both sample drawings
 | **Annex A(a)** — backfill material | `NEEDS_REVIEW` (no "RC Trench" element) | `NEEDS_REVIEW` (an "RC Trench" exists, but no backfill material is specified anywhere on the drawing) | See the RC Trench vs. RC Sump decision below |
 | **Annex A(b)** — minimum trench width | `NEEDS_REVIEW` (no "RC Trench" element) | `NEEDS_REVIEW` (width is known — 750mm — but depth/diameter/haunching are not) | Two conflicting formulas for T resolved by testing both against the rule card's own worked example (900+T=1500 only reconciles with the simple definition); missing haunching data treated as `NON_COMPLIANT` (a design failure) rather than `NEEDS_REVIEW` (an extraction failure) once pipe diameter exceeds 300mm |
 | **Annex A(c)** — removable trench cover | `NEEDS_REVIEW` (no "RC Trench" element) | `NEEDS_REVIEW` (an "RC Trench" exists, but no cover is described anywhere on the drawing) | Same RC Trench vs. RC Sump decision |
-| **SSW 1.2.4(a)** — no structure over sewer | `NEEDS_REVIEW` | `NEEDS_REVIEW` | The one genuinely geometric rule (shape-vs-shape, not label-vs-value) — engine built and unit-tested; real DXF geometry now exists for both drawings, but extracting the specific polylines it needs hasn't been implemented (see Section 3) |
+| **SSW 1.2.4(a)** — no structure over sewer | `NEEDS_REVIEW` | `NEEDS_REVIEW` | The one genuinely geometric rule (shape-vs-shape, not label-vs-value) — engine built and unit-tested; real geometry extraction was investigated (not assumed possible) and found to be genuine CAD-data-reconstruction work, not a quick step (see Section 3) |
 
 **The RC Trench vs. RC Sump decision**, made once and reused (via a
 shared `requireElementType()` precondition) across Annex A(a)/(b)/(c):
@@ -125,16 +125,31 @@ mid-exercise as tooling was found:
 **Net result**: both sample drawings now have real, exact-source-text
 data (`data/plans/plan-div-sanitised4.json` and
 `plan-annexA-sanitised2.json`), cross-validated against the original
-vision reading where both exist — every value matched exactly. What
-remains unfinished is narrower than "no DXF": the DXF files contain
-`LWPOLYLINE` geometry (confirmed: 239 such entities in one drawing
-alone), but extracting the *specific* polylines for a sewer centerline
-and a building footprint — what SSW 1.2.4(a) needs — hasn't been
-implemented; `dxf-search.ts` only reads text, not entity geometry. The
-drawing shows a "1M SEWER SETBACK LINE" and the building appears, by eye,
-to respect it — but "appears to, on a screenshot" is not a computed
-distance, and this project does not report a verdict it cannot actually
-compute.
+vision reading where both exist — every value matched exactly.
+
+SSW 1.2.4(a) is the exception, and it's worth being precise about why,
+because the reasoning changed once actually investigated rather than
+assumed. The DXF files do contain `LWPOLYLINE` geometry (confirmed: 239
+such entities in one drawing alone), so the first assumption was that
+extracting the specific sewer-centerline and building-footprint polylines
+would be a scoped, mechanical follow-up. **Investigating that directly
+(with `dxf-parser`, which correctly handles `LWPOLYLINE`/`INSERT` — this
+isn't the `MLEADER` problem from before) found otherwise**: the building
+has no single outline at all — its walls exist as ~28 separate 4-vertex
+rectangles (one per wall segment) spread across several layers, which
+would need to be traced into one polygon, a real reconstruction problem.
+And the one layer whose name looked right for the sewer
+(`A-_SEWR----_--`) turned out to contain a single block-reference
+(`INSERT`) at position `(166043907, 78733665)` — hundreds of millions of
+units away from every real site coordinate elsewhere in the same file
+(tens of thousands) — almost certainly a stray or mislabelled block, not
+the actual sewer line. Out of 123 layers total, neither name-matching nor
+the two most plausible candidates pointed at usable geometry; getting
+this right would need systematic, visually-cross-referenced layer
+inspection, not a quick script. The drawing shows a "1M SEWER SETBACK
+LINE" and the building appears, by eye, to respect it — but "appears to,
+on a screenshot" is not a computed distance, and this project does not
+report a verdict it cannot actually compute.
 
 ## 4. How this was actually built: working with Claude Code
 
@@ -184,17 +199,23 @@ defend every decision, not just that the code runs.
 
 ## 5. Limitations, stated proactively
 
-- **Geometric coordinate extraction isn't implemented yet.** DXF is no
-  longer the blocker (see Section 3) -- both drawings have real DXF files
-  with `LWPOLYLINE` geometry in them -- but identifying and extracting
-  the *specific* sewer-centerline and building-footprint polylines SSW
-  1.2.4(a) needs hasn't been built. `dxf-search.ts` only reads text.
+- **Geometric coordinate extraction was investigated and found genuinely
+  hard, not just unbuilt.** DXF is no longer the blocker (see Section 3)
+  -- both drawings have real DXF files with `LWPOLYLINE` geometry in them
+  -- but this drawing's building has no single outline (walls exist as
+  ~28 disjoint rectangles across several layers) and the layer that
+  looked like the sewer turned out to be a stray/mislabelled block
+  reference at an implausible position, not the real sewer line. Getting
+  this right needs real CAD-data reconstruction (resolving block
+  references, tracing a building outline from fragments, visually
+  cross-referencing layers), not a quick script -- confirmed by actually
+  trying, not assumed from the outset.
 - **The geometric rule was never tested against real drawing data**, as a
   direct consequence of the point above. Its engine is complete and
   unit-tested against synthetic coordinates (including a regression test
   for a real intersection-detection bug found while building it — see
   `docs/rules/ssw-1.2.4-a-no-structure-over-sewer.md`), ready to run the
-  moment that coordinate extraction exists.
+  moment usable coordinates exist.
 - **Drawing 2's "RC Trench" defers its own specification.** The one
   element in this project explicitly labelled "RC Trench" was found on
   drawing 2, but its own callout text says "TO PE'S DETAIL" — the actual
@@ -231,10 +252,13 @@ defend every decision, not just that the code runs.
   better tooling (DXF search) existed. A documented limitation is a
   snapshot of what was true *then*, not a permanent verdict -- worth
   re-checking once the tooling that produced it has changed.
-- Extract the sewer-centerline/building-footprint geometry SSW 1.2.4(a)
-  needs from the DXF `LWPOLYLINE` data now available -- the one piece of
-  the whole pipeline that's specified, engineered, and tested, but not
-  yet wired to real coordinates.
+- Actually reconstruct the sewer-centerline/building-footprint geometry
+  SSW 1.2.4(a) needs -- now understood to require resolving `INSERT`
+  block references correctly and tracing a building outline from ~28
+  disjoint wall-segment rectangles, likely cross-referenced against the
+  visual drawing to identify the right layers among 123 candidates. Real
+  scoped work, now that the investigation has defined what it actually
+  involves, rather than a vague "wire up the coordinates" TODO.
 - Get the actual "PE's detail" drawing referenced by drawing 2's RC
   Trench callout, if it exists in a fuller set -- would resolve Annex
   A(a)/(b)/(c) for that element with real data instead of `NEEDS_REVIEW`.

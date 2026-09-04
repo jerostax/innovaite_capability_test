@@ -211,6 +211,47 @@ command-line `grep` tool while first investigating these drawings. It
 doesn't understand DXF structure at all, which is precisely why it isn't
 fooled by structure it doesn't need to understand.
 
+## Geometry extraction for SSW 1.2.4(a): investigated, found genuinely hard
+
+A natural next question once `dxf-search.ts` existed: SSW 1.2.4(a) needs
+actual coordinates (a sewer centerline, a building footprint), not text —
+could the DXF's `LWPOLYLINE` geometry (which `dxf-parser` *does* handle
+correctly, unlike `MLEADER`) supply that directly? This was investigated
+properly rather than left as an assumed-easy TODO, using `dxf-parser`
+scoped specifically to geometric entity types.
+
+**Findings, on the real "(div)" drawing**:
+- The building has no single outline. Its walls exist as ~28 separate
+  4-vertex `LWPOLYLINE` rectangles (one per wall segment's thickness)
+  spread across multiple layers (`A-_WALL----_N`, `A-_SITEWALL_E-`, ...).
+  There's no ready polygon for "the building footprint" -- one would have
+  to be reconstructed by tracing the outer boundary of ~28 disjoint
+  rectangles, a real geometric problem, not a lookup.
+- A layer named `A-_SEWR----_--` exists and looks like an obvious
+  candidate for the sewer -- but it contains exactly one entity, an
+  `INSERT` (block reference) named `"sewer setback"`, inserted at
+  position `(166043907, 78733665)` with a 100x scale and ~196° rotation.
+  Every real site coordinate found elsewhere in the same file is in the
+  tens of thousands, not hundreds of millions -- this insertion point
+  isn't anywhere on the actual site. Resolving the block's internal
+  geometry (a few `LINE`/`LWPOLYLINE` entities on layers like `MH_Line`)
+  and applying that transform didn't produce anything resembling the
+  drawn sewer line. Most likely a stray or mislabelled block; the layer
+  name was a false lead.
+- The drawing has 123 layers total. Neither keyword-matching
+  (`/sewer|drain|boundary|wall/i`) nor the two most plausible candidates
+  above pointed at usable geometry.
+
+**Conclusion**: unlike the text-search pivot (where the fix was "use a
+narrower, more reliable tool"), there's no equivalent narrow fix here --
+correctly identifying the right layers and reconstructing usable
+geometry from them is real CAD-data work (resolve block references
+properly, trace a building outline from fragments, likely cross-reference
+layers against the visual drawing to confirm identity), not a scoped
+follow-up script. Recorded here so the honest scope of "what's left" for
+this rule reflects an actual investigation, not an optimistic guess made
+right after DXF access was obtained.
+
 ## Why the vision extraction script was not run
 
 `src/extraction/vision-extract-ic-mh.ts` calls the Claude API with an image

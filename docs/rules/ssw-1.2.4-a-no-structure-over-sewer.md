@@ -63,29 +63,63 @@ centerline and the building footprint, in the same coordinate space.
 
 **Update**: real DXF files now exist for both sample drawings (converted
 via ODA File Converter — see `docs/design-decisions.md`, "DXF extraction:
-parser vs. targeted search"), and they do contain `LWPOLYLINE` geometry
-(confirmed: 239 such entities in one sample drawing alone). What's
-missing isn't DXF access anymore — it's the specific step of identifying
-*which* polylines are the sewer centerline and the building footprint,
-and extracting their coordinates. `src/extraction/dxf-search.ts` only
-does text search; it doesn't read entity geometry. That's real, scoped,
-achievable follow-up work, not a blocked dependency. Rather than rush
-that extraction and risk a wrong pairing, this still resolves to
-`NEEDS_REVIEW` for now:
+parser vs. targeted search"). At that point the plan was to identify the
+specific sewer-centerline and building-footprint polylines and extract
+their coordinates — expected to be a scoped, mechanical follow-up. **It
+turned out not to be**, and this was actually investigated (with
+`dxf-parser`, which handles `LWPOLYLINE`/`INSERT` correctly, unlike the
+`MLEADER` case documented in `docs/design-decisions.md`), not just
+assumed to be hard:
+
+- **The building has no single outline.** Its walls exist as ~28
+  separate 4-vertex `LWPOLYLINE` rectangles (one per wall segment, each
+  representing that wall's thickness) spread across several layers
+  (`A-_WALL----_N`, `A-_SITEWALL_E-`, etc.). There is no ready-made
+  polygon for "the building footprint" — one would have to be
+  reconstructed by tracing the outer boundary of ~28 disjoint rectangles,
+  a real geometric reconstruction problem in its own right, not a lookup.
+- **The layer that looks like the sewer isn't.** A layer literally named
+  `A-_SEWR----_--` exists and contains exactly one entity — but it's an
+  `INSERT` (a block reference) named `"sewer setback"`, inserted at
+  position `(166043907, 78733665)` with a 100x scale and a ~196° rotation.
+  Real site coordinates elsewhere in the same drawing are in the tens of
+  thousands, not hundreds of millions — this insertion point is not
+  anywhere on the actual site. Resolving the referenced block's internal
+  geometry (a handful of `LINE`/`LWPOLYLINE` entities on layers like
+  `MH_Line`) and applying that transform did not produce anything
+  resembling the sewer line visible in the drawing. Most likely a stray
+  or mislabelled block, not the real sewer geometry — the layer name was
+  misleading.
+- **The drawing has 123 layers total**, and neither name-matching
+  (`/sewer|drain|boundary/i`) nor the two "obvious" candidates above
+  actually pointed at usable geometry. Correctly identifying the right
+  layers would need systematic layer-by-layer inspection cross-referenced
+  against the visual drawing (e.g. matching on-screen colors to layers),
+  not a quick script.
+
+**Conclusion**: this is real, substantial CAD-data-modeling work — not
+the "scoped, achievable follow-up" it was described as right after DXF
+access was obtained. That earlier framing undersold the difficulty; this
+is the corrected, investigated assessment. Still `NEEDS_REVIEW`:
 
 - The rule engine itself is fully built and unit-tested (23/23 tests
   passing across all 5 rules, including this one, all against synthetic
-  coordinates).
-- It has never run against real drawing geometry.
-- This is the rule to prioritise finishing next — the hard part (the
-  geometry engine) is already done and tested; only the coordinate
-  extraction is missing, and the tooling to do it now exists.
+  coordinates) and is ready the moment usable coordinates exist.
+- It has never run against real drawing geometry, and won't without
+  either a much deeper CAD-reverse-engineering effort (resolving block
+  references correctly, reconstructing building outlines from wall
+  fragments, verifying layers visually) or a source drawing that draws
+  the sewer centerline and building outline as single, cleanly-labelled
+  polylines to begin with.
 
 ## Verdict
 
 ```
-sewerCenterline: not yet extracted from the real DXF
-buildingFootprint: not yet extracted from the real DXF
+sewerCenterline: investigated in the real DXF -- the layer that looked
+                 right (A-_SEWR----_--) turned out to be a mislabelled/
+                 stray block, not the real sewer geometry
+buildingFootprint: investigated in the real DXF -- exists only as ~28
+                    disjoint wall-segment rectangles, no single outline
 → NEEDS_REVIEW
 ```
 
