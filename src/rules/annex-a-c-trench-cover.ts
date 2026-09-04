@@ -1,4 +1,4 @@
-import { Verdict, result, needsReview, type RuleResult } from "./types.ts";
+import { Verdict, result, needsReview, requireElementType, type RuleResult } from "./types.ts";
 
 // SSW Annex A (c) - Provision of removable trench cover.
 // Reasoning, the RC Trench vs RC Sump decision, and drawing evidence:
@@ -18,17 +18,8 @@ export interface TrenchCoverElement {
 }
 
 export function evaluate(element: TrenchCoverElement): RuleResult {
-  if (!element.elementType) {
-    return needsReview(
-      "Could not determine what type of element this is (no label read from the drawing) -- cannot confirm this rule even applies."
-    );
-  }
-
-  if (element.elementType.trim().toLowerCase() !== "rc trench") {
-    return needsReview(
-      `This rule's text and title are specific to "RC Trench". This element is labelled "${element.elementType}" on the drawing -- different terminology, and possibly a different construction standard. Flagging for human review of whether the rule applies, rather than assuming it does.`
-    );
-  }
+  const typeGate = requireElementType(element.elementType, "RC Trench");
+  if (typeGate) return typeGate;
 
   const cover = element.cover;
   if (!cover || cover.present == null) {
