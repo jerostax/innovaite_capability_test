@@ -1,8 +1,8 @@
 {
   "id": "DXC-x-PUB-1.2.1b-1.1.3a-1.2.4a-1.2.4b-4.2.1-div-sanitised-4",
   "sourceFile": "Capability Testing Pack/2D/(DXC x PUB) 1.2.1b, 1.1.3a, 1.2.4a, 1.2.4b, 4.2.1 (div) -sanitised (4).dwg",
-  "extractionMethod": "Manual visual reading of zoomed screenshots exported from Autodesk DWG TrueView. No DXF export was available (no CAD software beyond the free viewer, which doesn't support DXF export); PDF export was attempted and rendered blank for this specific file (screen-oriented plot style with invisible colors on white paper, not resolved). See docs/design-decisions.md, \"Extraction method hierarchy\", for the full attempt order and the verified finding that PDF text extraction (tried on the other sample drawing) does not contain this drawing layer's annotations at all.",
-  "extractionConfidence": "Values below were read by eye off the drawing's text callouts, not OCR'd or taken from vector coordinates. See docs/design-decisions.md \"Confidence scoring\" for what the per-verdict confidence numbers represent.",
+  "extractionMethod": "Originally read by eye off zoomed screenshots (no DXF was available at the time -- see docs/design-decisions.md, 'Extraction method hierarchy'). Later re-verified against a real DXF (converted from the source DWG via ODA File Converter) using src/extraction/dxf-search.ts: every value below matches the DXF's exact source text exactly (EXG'T LAST MH new T.L 110.450, EXG'T LAST IC new T.L 110.460, both RC SUMP callout texts) -- the original manual reading was accurate, now confirmed rather than assumed.",
+  "extractionConfidence": "Cross-validated against exact DXF source text (see extractionMethod). See docs/design-decisions.md \"Confidence scoring\" for what the per-verdict confidence numbers represent.",
 
   "icMhPairs": [
     {

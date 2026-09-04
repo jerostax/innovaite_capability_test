@@ -59,7 +59,9 @@ export function adjudicateDrawing(drawing: Drawing) {
 }
 
 // CLI entry point: `node src/adjudicate.ts [path-to-plan.json]`
-const { readFileSync } = await import("node:fs");
+// With no argument, runs every data/plans/*.json file found -- both sample
+// drawings now have one (see data/plans/plan-annexA-sanitised2.json).
+const { readFileSync, readdirSync } = await import("node:fs");
 const { fileURLToPath, pathToFileURL } = await import("node:url");
 const { dirname, join } = await import("node:path");
 
@@ -68,19 +70,26 @@ const { dirname, join } = await import("node:path");
 // what makes this "am I the entry point" check actually work here.
 if (import.meta.url === pathToFileURL(process.argv[1] ?? "").href) {
   const __dirname = dirname(fileURLToPath(import.meta.url));
-  const planPath = process.argv[2] ?? join(__dirname, "..", "data", "plans", "plan-div-sanitised4.json");
+  const plansDir = join(__dirname, "..", "data", "plans");
+  const planPaths = process.argv[2]
+    ? [process.argv[2]]
+    : readdirSync(plansDir)
+        .filter((f) => f.endsWith(".json"))
+        .map((f) => join(plansDir, f));
 
-  const drawing: Drawing = JSON.parse(readFileSync(planPath, "utf8"));
-  const report = adjudicateDrawing(drawing);
+  for (const planPath of planPaths) {
+    const drawing: Drawing = JSON.parse(readFileSync(planPath, "utf8"));
+    const report = adjudicateDrawing(drawing);
 
-  console.log(`\nAdjudication report: ${report.drawingId}\n${"=".repeat(60)}`);
-  for (const element of report.results) {
-    console.log(`\n[${element.elementType}] ${element.elementId}`);
-    for (const v of element.verdicts) {
-      console.log(`  - ${v.ruleId}: ${v.verdict} (confidence ${v.confidence})`);
-      for (const r of v.reasoning) console.log(`      reason: ${r}`);
-      for (const e of v.evidence) console.log(`      evidence: ${e}`);
+    console.log(`\nAdjudication report: ${report.drawingId}\n${"=".repeat(60)}`);
+    for (const element of report.results) {
+      console.log(`\n[${element.elementType}] ${element.elementId}`);
+      for (const v of element.verdicts) {
+        console.log(`  - ${v.ruleId}: ${v.verdict} (confidence ${v.confidence})`);
+        for (const r of v.reasoning) console.log(`      reason: ${r}`);
+        for (const e of v.evidence) console.log(`      evidence: ${e}`);
+      }
     }
+    console.log();
   }
-  console.log();
 }

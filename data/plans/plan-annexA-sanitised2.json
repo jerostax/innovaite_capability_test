@@ -1,0 +1,41 @@
+{
+  "id": "DXC-x-PUB-1.2.1b-1.1.3a-1.1.3-bii-Annex-A-sanitised-2",
+  "sourceFile": "Capability Testing Pack/2D/(DXC x PUB) 1.2.1b, 1.1.3a, 1.1.3 (bii), Annex A - sanitised (2).dwg",
+  "extractionMethod": "DXF raw-text search (src/extraction/dxf-search.ts) against a DXF converted from the source DWG via ODA File Converter (a free tool, distinct from Autodesk DWG TrueView, which does not export DXF). All values below are exact source text, not a vision/screenshot read -- see docs/design-decisions.md, 'DXF extraction: parser vs. targeted search'.",
+
+  "icMhPairs": [
+    {
+      "id": "IC-unpaired",
+      "label": "EXT'G IC TO BE RETAINED AND MADE GOOD",
+      "inspectionChamberTopLevel_m": 29.5,
+      "manholeTopLevel_m": null,
+      "notes": "Unlike the other sample drawing, this file has no 'LAST IC'/'LAST MH' naming convention to unambiguously identify which manhole this chamber connects to. Several 'EXISTING MH (SEW)' entries exist in the file (with GIS IDs 290259/290343), but their T.L. values (~2.0-2.2m) are on a completely different scale from this IC's T.L. (29.500m) -- almost certainly a different reference datum, or manholes that are simply not the one this chamber connects to. Rather than guess a pairing, manholeTopLevel_m is left null -- this resolves to NEEDS_REVIEW, which is the honest outcome: the rule cannot be answered without knowing which manhole is the real connection, and text search alone can't determine that (it would need the drawing's actual connectivity/topology, not just nearby text)."
+    }
+  ],
+
+  "trenches": [
+    {
+      "id": "TRENCH-750",
+      "elementType": "RC Trench",
+      "label": "NEW 750MM WIDE RC TRENCH OVER EXTG MINOR SEWER LINE TO PE'S DETAIL",
+      "backfillMaterial": null,
+      "sewerDepth_mm": null,
+      "sewerNominalDiameter_mm": null,
+      "haunchingThickness_mm": null,
+      "trenchWidth_mm": 750,
+      "cover": { "present": null, "removable": null, "hasLiftingFeature": null },
+      "notes": "The first (and only) element in this whole project genuinely labelled 'RC Trench' -- found via DXF search after the manual screenshot-hunt for it was abandoned earlier in the project (see docs/write-up.md, Section 5, for that history). Width is explicit (750mm). Everything else (depth, diameter, haunching, backfill material, cover) was searched for specifically (SAND/GRANITE/GRAVEL/CRUSHER/AGGREGATE/BACKFILL/REMOVABLE/LIFTING/HAUNCH/'M DEEP', all zero matches) and is genuinely absent from this drawing -- not a search failure. The callout text itself says why: 'TO PE'S DETAIL' -- the actual construction specification is deferred to a separate Professional Engineer's detail drawing not included in this sample. A nearby annotation ('EXT'G ⌀150 Y-JUNCTION CONNECTION TO SEWER LINE') may describe the same pipe (diameter 150mm), but the two text entities are not spatially linked by this search method, so sewerNominalDiameter_mm is left null rather than assumed from proximity alone."
+    }
+  ],
+
+  "buildingVsSewerChecks": [],
+
+  "otherElementsFound": {
+    "note": "Elements found on this drawing that don't map to any of the 5 rules in this project, kept here for completeness/traceability rather than discarded.",
+    "rcSumps": [
+      { "label": "RC SUMP-1 (550 x 550)", "topLevel_m": 29.47, "invertLevel_m": 29.0 },
+      { "label": "RC SUMP-2 (550 x 550)", "topLevel_m": 29.47, "invertLevel_m": 28.66, "alsoFoundAs": "I.L. 28.620 elsewhere in the file" },
+      { "label": "RC SUMP-3, WITH VERTICAL M/S GRATING", "topLevel_m": 29.35, "invertLevel_m": 28.56, "sizeConflict": "labelled both '450 x 450' and '550 x 550' at different locations in the file -- most likely two distinct sumps sharing the same number under a per-unit numbering convention (the site plan shows multiple similar units side by side, each apparently numbering its own sumps 1/2/3), not one inconsistent sump. Not resolved further -- flagged as an observation, not used in any verdict." }
+    ]
+  }
+}
