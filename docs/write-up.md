@@ -16,12 +16,14 @@ built as two stages connected by a fixed data contract (`data/*.json` in,
 independent of how good extraction is on any given drawing — which
 mattered, since extraction turned out to be the real bottleneck.
 
-Two things surfaced immediately on reading the materials: some rule files
-received before the official pack was available had names that didn't
-match their content (the official pack itself is consistent — the engine
-identifies a rule by its internal `Rule ID`, never by filename), and the
-rule cards' own prose sometimes disagrees with their own worked examples
-(see Annex A(b) below — worked numbers were trusted over prose).
+One thing surfaced immediately on reading the materials: the rule cards'
+own prose sometimes disagrees with their own worked examples (see Annex
+A(b) below — worked numbers were trusted over prose, on the reasoning
+that a concrete numeric example is less likely to contain a drafting slip
+than a formula typed out in English). The rule engine also never
+identifies a rule by filename, only by the `Rule ID` field inside the
+document — general defensive practice, not a reaction to a specific
+incident.
 
 ## 2. The five rules — results on both sample drawings
 
