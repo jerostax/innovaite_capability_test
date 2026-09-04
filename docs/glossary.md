@@ -17,6 +17,7 @@ it — so the reasoning behind each reading is traceable later.
 | **RC** | Reinforced Concrete — concrete strengthened with internal steel bars. | "RC TRENCH", "RC SUMP" |
 | **M/S** | Mild Steel — a common structural steel grade. | "REMOVABLE M/S GRATING COVER" |
 | **Grating** | A mesh/grid-pattern cover (lets water/air through), as opposed to a solid slab. | "REMOVABLE M/S GRATING COVER" |
+| **PUB** | Public Utilities Board — Singapore's national water agency (water supply, drainage, sewerage). The regulator whose approval Rule SSW 1.2.4(a) requires before building over/across a sewer. | Filenames ("DXC x PUB..."), rule text of SSW 1.2.4(a) |
 
 ## Why this matters
 
