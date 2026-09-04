@@ -1,0 +1,23 @@
+{
+  "ruleId": "SSW 1.2.4 (a)",
+  "name": "No building/structure over or across sewer",
+  "handbook": "Code of Practice on Sewerage and Sanitary Works",
+  "edition": "3rd Edition - March 2025",
+  "chapter": "1 Planning for Development Works",
+  "section": "1.2 Technical Considerations",
+  "sourceFile": "Capability Testing Pack/Annex A - The rules/SSW 1.2.4 (a)(i) No building structure over or across sewer.docx",
+  "description": "No structure or building shall be placed over or across any sewer without the approval of PUB.",
+  "interpretation": {
+    "targetElement": "PipeSegment (Sewer Pipe) vs building/structure footprint",
+    "verdictLogic": "NON_COMPLIANT if any building/structure geometry intersects the sewer pipe or comes within the required setback distance. COMPLIANT if the building is placed away from the sewer with the required setback maintained.",
+    "geometryNote": "The one rule in this pack that is purely geometric rather than a label/value lookup -- it compares the sewer pipe's centerline against the building footprint polygon (a spatial intersection or minimum-distance test), not a text annotation to read."
+  },
+  "sampleScenarios": [
+    { "id": "compliant", "description": "A building is located with required sewer setback distance from the sewer.", "expectedVerdict": "COMPLIANT" },
+    { "id": "non-compliant", "description": "A building is placed over a sewer.", "expectedVerdict": "NON_COMPLIANT" }
+  ],
+  "matchedPlanElement": {
+    "drawing": "(DXC x PUB) 1.2.1b, 1.1.3a, 1.2.4a, 1.2.4b, 4.2.1 (div) -sanitised (4).dwg",
+    "note": "The plan draws a '1M SEWER SETBACK LINE' next to the existing sewer, so the required setback distance (1m) is known, and the building footprint visually appears to stay outside it. This CANNOT be verified programmatically without vector coordinates for both the sewer centerline and the building footprint -- no DXF was ever obtained for either sample drawing (see docs/design-decisions.md). Resolves to NEEDS_REVIEW: a visual impression on a screenshot is not a computed distance, and this project does not report a verdict it cannot actually compute. The rule engine itself (src/rules/ssw-1-2-4-a-no-structure-over-sewer.ts, src/geometry/distance.ts) is fully implemented and unit-tested against synthetic coordinates -- it is ready to run the moment real vector geometry becomes available."
+  }
+}
