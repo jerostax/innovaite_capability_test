@@ -34,13 +34,8 @@ ELSE:
 ## Reused decision: the same RC Trench vs. RC Sump gate as Annex A(c)
 
 This rule is written against "RC Trench" specifically, exactly like
-Annex A(c) — and the sample drawing has the same gap: no element is
-labelled "RC Trench" anywhere, only "RC Sump". Rather than duplicate the
-reasoning, this rule reuses the exact same precondition check
-(`requireElementType()` in `src/rules/types.ts`), extracted into a shared
-function once the second rule needed it (see the "RC Trench vs. RC Sump"
-section of [`annex-a-c-trench-cover.md`](annex-a-c-trench-cover.md) for
-the full reasoning behind why that gate exists at all).
+Annex A(c) — full reasoning (why, and the shared `requireElementType()`
+function this uses): [`design-decisions.md`](../design-decisions.md#rc-trench-vs-rc-sump-the-decision-behind-requireelementtype).
 
 ## Reading it off the sample drawing
 

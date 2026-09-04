@@ -1,7 +1,86 @@
 # Design Decisions
 
 Cross-cutting choices that apply to more than one rule, recorded here instead
-of being repeated in every `docs/rules/*.md` file.
+of being repeated in every `docs/rules/*.md` file. Each rule's own doc links
+back here rather than re-arguing these from scratch.
+
+## RC Trench vs. RC Sump: the decision behind `requireElementType()`
+
+Applies to: **Annex A(a), A(b), A(c)** — all three are written specifically
+against an "RC Trench" element.
+
+The one sample drawing fully processed (`(div) -sanitised (4).dwg`) never
+shows an element explicitly labelled **"RC Trench"** with construction
+details — it repeatedly shows an **"RC Sump w/ removable M/S grating
+cover"** instead (see [glossary.md](glossary.md) for RC/M/S/grating).
+*(The second sample drawing, `Annex A - sanitised (2).dwg`, was never
+fully processed — an "RC TRENCH" reference was glimpsed in it early on but
+never confirmed — so whether it contains one is unresolved, not ruled
+out. See the write-up's limitations section.)*
+
+RC Trench and RC Sump are physically different: a trench is a long,
+narrow channel protecting a *running* pipe over a length; a sump is a
+*compact* collection point. They may carry different construction
+standards not visible in this sample (e.g. a trench cover might need to
+bear vehicle loads a sump cover doesn't).
+
+**Two options were weighed**:
+- Treat RC Sump as equivalent to RC Trench (same top-access,
+  removable-cover logic applies to both) — evaluate the sump's data
+  directly against each rule.
+- Flag the terminology mismatch and stop — since the rule text is
+  specific to "trench," and the three Annex A rules together describe RC
+  Trench *construction* as a coherent whole, substituting a different
+  element type is an assumption, not a read.
+
+**Decision: the second option** — made explicitly, weighing both sides,
+during the exercise, not defaulted to. Every Annex A(a)/(b)/(c) rule
+checks the element's labelled type before evaluating anything else via a
+shared precondition, `requireElementType()` (`src/rules/types.ts`): if it
+isn't "RC Trench", the verdict is `NEEDS_REVIEW`, regardless of how
+compliant the rest of the data looks. This matches the brief's own
+guidance — flag uncertainty for human review rather than overclaim. A
+false `COMPLIANT` built on a guessed equivalence is worse than an honest
+"couldn't confirm this rule applies here."
+
+### Why `requireElementType()` is a shared function, not copy-pasted three times
+
+Annex A(c) was implemented first, with this check written inline. When
+Annex A(a) needed the exact same precondition, it was extracted into
+`src/rules/types.ts` and Annex A(c) was refactored to use the shared
+version too (`git log` commit `a44bbe2`) — done as its own commit, with
+the existing tests re-run unchanged to confirm no behavior moved. Annex
+A(b) then used the shared function from the start. This is a small
+example of a DRY (Don't Repeat Yourself) instinct applied mid-project
+rather than planned upfront: the duplication only became visible once a
+second rule actually needed the same check, and fixing it then (rather
+than deferring "cleanup" indefinitely) kept the three rules' behavior
+provably identical for this shared concern.
+
+## Missing data: extraction failure vs. design failure
+
+Applies to: **every rule**, but the distinction was first identified and
+is most visible in **Annex A(b)** (minimum trench width).
+
+Every rule defaults missing input to `NEEDS_REVIEW` — except one specific
+case in Annex A(b): once pipe diameter exceeds 300mm, an unspecified
+haunching thickness resolves straight to `NON_COMPLIANT`, not
+`NEEDS_REVIEW`. This is a deliberate distinction, not an inconsistency:
+
+- **We failed to read a value that's actually on the drawing** (e.g. a
+  chamber's level, printed clearly, but hard to make out on a screenshot)
+  → our extraction failure → `NEEDS_REVIEW`.
+- **The drawing itself never specifies a value the Code requires it to
+  specify** (haunching thickness, once diameter > 300mm — verified
+  against the rule card's own worked "haunching not provided" scenarios,
+  which are marked non-compliant even though the built width exactly
+  satisfies the zero-haunching arithmetic) → a design/documentation
+  failure → `NON_COMPLIANT`.
+
+Full worked-example evidence for this specific case: `docs/rules/annex-a-b-trench-width.md`.
+The principle generalizes: any future rule with a Code-mandated value
+(not just a drawing convenience) should apply the same distinction rather
+than defaulting every gap to `NEEDS_REVIEW` by reflex.
 
 ## Confidence scoring
 
@@ -47,6 +126,12 @@ a real, verified technical finding, not an assumption:
    DWG-version conversion and DWF/DWFx/PDF export). This is the format
    that would make extraction closest to mechanical/exact; its absence is
    the single biggest limitation of this project.
+   **Not yet tried**: ODA File Converter, a free tool from the Open
+   Design Alliance built specifically for DWG↔DXF conversion (unlike DWG
+   TrueView, which is Autodesk's own viewer and deliberately omits DXF
+   export). This is a genuinely different tool, not another attempt with
+   the same one -- worth trying before treating DXF as permanently
+   unreachable.
 2. **PDF text extraction (mechanically extracted, real embedded text, no
    vision involved)** -- attempted for both drawings; worked (non-blank)
    for one of the two (`Annex A - sanitised (2).pdf`), blank for the other

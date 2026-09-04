@@ -55,17 +55,12 @@ call this compliant.
 **Interpretation**: once pipe diameter exceeds 300mm, the Code requires
 haunching thickness to be specified as part of the design — its absence
 is not something to treat as missing data we failed to extract, it's the
-design itself failing to demonstrate compliance.
-
-This is a deliberate departure from every other rule in this project
-(where missing input defaults to `NEEDS_REVIEW`). The distinction drawn:
-
-- **We failed to read a value that's actually on the drawing** (e.g. a
-  chamber's level, printed clearly but the screenshot was too blurry) →
-  our extraction failure → `NEEDS_REVIEW`.
-- **The drawing itself never specifies a value the Code requires it to
-  specify** (haunching thickness, once diameter > 300mm) → a design/
-  documentation failure → `NON_COMPLIANT`.
+design itself failing to demonstrate compliance. This is a deliberate,
+generalizable departure from every other rule's default (missing input →
+`NEEDS_REVIEW`) — the "our extraction failure vs. a design/documentation
+failure" distinction behind it, and why it's a project-wide principle and
+not a one-off exception, is in
+[`design-decisions.md`](../design-decisions.md#missing-data-extraction-failure-vs-design-failure).
 
 Diameter ≤ 300mm never needs haunching at all (flat 750mm rule), so this
 distinction only matters once diameter > 300mm.

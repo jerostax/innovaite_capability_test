@@ -26,39 +26,10 @@ ELSE:
 
 ## The RC Trench vs. RC Sump decision
 
-The one drawing that was fully processed (`(div) -sanitised (4).dwg`)
-doesn't show an element explicitly labelled **"RC Trench"** with cover
-details — it repeatedly shows an **"RC Sump w/ removable M/S grating
-cover"** instead — see [glossary.md](../glossary.md) for what RC, M/S,
-and grating mean. The second sample drawing (`Annex A - sanitised
-(2).dwg`) was never fully processed (see `docs/write-up.md`, Section 5),
-so whether it contains an "RC Trench" is unresolved, not ruled out — this
-decision is based on the one drawing actually checked.
-
-An RC Trench and an RC Sump are physically different things: a trench is a
-long, narrow channel that protects a *running* pipe over a length; a sump
-is a compact pit that collects water at a *single point*. They may be
-governed by different construction standards that aren't visible from this
-sample.
-
-**Two options were considered:**
-
-- **Treat RC Sump as equivalent to RC Trench for this rule** — same
-  underlying logic applies (top access, removable cover with lifting
-  feature), so evaluate the sump's grating cover against the rule directly.
-- **Flag the terminology mismatch and stop** — the rule's title and text
-  are specific to "trench", and this exercise is explicitly about three
-  Annex A rules that together describe RC Trench *construction* as a
-  coherent whole. Substituting a different element type is an assumption
-  the rule engine shouldn't make silently.
-
-**Decision: the second option.** The rule engine checks the element's
-labelled type before evaluating anything about its cover — if it isn't
-"RC Trench", the verdict is `NEEDS_REVIEW`, regardless of how compliant
-the cover itself looks. This matches the brief's own guidance: *flag
-uncertainty for human review rather than overclaim.* A false `COMPLIANT`
-built on a guessed equivalence is worse than an honest "couldn't confirm
-this rule applies here."
+This rule is one of three (with Annex A(a)/(b)) gated on the element
+being labelled "RC Trench" — full reasoning, the options weighed, and why
+the sample drawing's "RC Sump" elements don't qualify:
+[`design-decisions.md`](../design-decisions.md#rc-trench-vs-rc-sump-the-decision-behind-requireelementtype).
 
 ## Reading it off the sample drawing
 
