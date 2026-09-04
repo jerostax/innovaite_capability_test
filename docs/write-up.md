@@ -41,45 +41,62 @@ drawings were read in full. Two things surfaced immediately:
 ## 2. The five rules, and the judgement calls behind each
 
 Full reasoning, drawing evidence, and traceability to code/tests for each
-rule: `docs/rules/*.md`. Summary of the interesting decisions:
+rule: `docs/rules/*.md`. Verdicts against both sample drawings
+(`data/plans/plan-div-sanitised4.json`, the first drawing, and
+`data/plans/plan-annexA-sanitised2.json`, the second):
 
-| Rule | Verdict on the real drawing | Key judgement call |
-|---|---|---|
-| **SSW 1.2.1(b)** — IC top level vs. manhole top level | **COMPLIANT** (110.460m vs 110.450m, 10mm margin) | Used the drawing's *new/proposed* levels, not the existing ones, since the rule governs what will be built |
-| **Annex A(a)** — backfill material | `NEEDS_REVIEW` | No element labelled "RC Trench" found — see the RC Trench vs. RC Sump decision below |
-| **Annex A(b)** — minimum trench width | `NEEDS_REVIEW` (untestable on this drawing) — but internal ambiguities resolved by calculation | Two conflicting formulas for T resolved by testing both against the rule card's own worked example (900+T=1500 only reconciles with the simple definition); missing haunching data treated as `NON_COMPLIANT` (a design failure) rather than `NEEDS_REVIEW` (an extraction failure) once pipe diameter exceeds 300mm |
-| **Annex A(c)** — removable trench cover | `NEEDS_REVIEW` | Same RC Trench vs. RC Sump decision |
-| **SSW 1.2.4(a)** — no structure over sewer | `NEEDS_REVIEW` | The one genuinely geometric rule (shape-vs-shape, not label-vs-value) — engine built and unit-tested, never run on real coordinates (no DXF) |
+| Rule | Drawing 1 (`(div)`) | Drawing 2 (`Annex A`) | Key judgement call |
+|---|---|---|---|
+| **SSW 1.2.1(b)** — IC top level vs. manhole top level | **COMPLIANT** (110.460m vs 110.450m, 10mm margin) | `NEEDS_REVIEW` (an IC exists, but no unambiguous connecting manhole — see below) | Used the drawing's *new/proposed* levels, not the existing ones, since the rule governs what will be built |
+| **Annex A(a)** — backfill material | `NEEDS_REVIEW` (no "RC Trench" element) | `NEEDS_REVIEW` (an "RC Trench" exists, but no backfill material is specified anywhere on the drawing) | See the RC Trench vs. RC Sump decision below |
+| **Annex A(b)** — minimum trench width | `NEEDS_REVIEW` (no "RC Trench" element) | `NEEDS_REVIEW` (width is known — 750mm — but depth/diameter/haunching are not) | Two conflicting formulas for T resolved by testing both against the rule card's own worked example (900+T=1500 only reconciles with the simple definition); missing haunching data treated as `NON_COMPLIANT` (a design failure) rather than `NEEDS_REVIEW` (an extraction failure) once pipe diameter exceeds 300mm |
+| **Annex A(c)** — removable trench cover | `NEEDS_REVIEW` (no "RC Trench" element) | `NEEDS_REVIEW` (an "RC Trench" exists, but no cover is described anywhere on the drawing) | Same RC Trench vs. RC Sump decision |
+| **SSW 1.2.4(a)** — no structure over sewer | `NEEDS_REVIEW` | `NEEDS_REVIEW` | The one genuinely geometric rule (shape-vs-shape, not label-vs-value) — engine built and unit-tested; real DXF geometry now exists for both drawings, but extracting the specific polylines it needs hasn't been implemented (see Section 3) |
 
 **The RC Trench vs. RC Sump decision**, made once and reused (via a
 shared `requireElementType()` precondition) across Annex A(a)/(b)/(c):
-the one drawing that was fully processed doesn't show an element
-explicitly labelled "RC Trench" with construction details — it repeatedly
-shows "RC Sump w/ removable M/S grating cover" instead. (The second
-drawing was never fully processed — see Section 5 — so whether it
-contains an "RC Trench" is unresolved, not ruled out.) RC Trench and RC
-Sump are a related but physically different element (a
-trench protects a *running* pipe over a length; a sump is a *compact*
-collection point, and may carry different construction standards not
-visible in this sample). Rather than assume the two are interchangeable
-and risk a false `COMPLIANT`, every rule specific to "RC Trench" checks
-the element's labelled type first and returns `NEEDS_REVIEW` if it
-doesn't match — flagging the terminology mismatch for a human rather than
-guessing. This was a decision made collaboratively during the exercise
-(see Section 4) after weighing both options explicitly.
+Drawing 1 doesn't show an element explicitly labelled "RC Trench" with
+construction details — it repeatedly shows "RC Sump w/ removable M/S
+grating cover" instead. RC Trench and RC Sump are a related but
+physically different element (a trench protects a *running* pipe over a
+length; a sump is a *compact* collection point, and may carry different
+construction standards not visible in this sample). Rather than assume
+the two are interchangeable and risk a false `COMPLIANT`, every rule
+specific to "RC Trench" checks the element's labelled type first and
+returns `NEEDS_REVIEW` if it doesn't match — flagging the terminology
+mismatch for a human rather than guessing. This was a decision made
+collaboratively during the exercise (see Section 4) after weighing both
+options explicitly.
+
+Drawing 2, unlike drawing 1, *does* contain a real "RC Trench" element —
+found once real DXF text search became available (see Section 3), after
+an earlier screenshot-based search for it had been abandoned. It's still
+`NEEDS_REVIEW` on all three Annex A rules, but for a different, more
+specific reason: the callout text itself ("NEW 750MM WIDE RC TRENCH OVER
+EXTG MINOR SEWER LINE **TO PE'S DETAIL**") explicitly defers the
+construction specification to a separate Professional Engineer's detail
+drawing that isn't part of this sample. Width (750mm) is the one value
+this callout does give directly.
 
 ## 3. Reading the drawings: the real difficulty, and what was actually tried
 
 This is the part of the exercise most representative of the real problem,
-and where a genuine tooling wall was hit — documented rather than glossed
-over (full detail: `docs/design-decisions.md`, "Extraction method
-hierarchy").
+and where several genuine tooling walls were hit and worked through — all
+documented rather than glossed over (full detail: `docs/design-decisions.md`,
+"Extraction method hierarchy" and "DXF extraction: parser vs. targeted
+search").
 
-Three methods were tried, in order of rigor:
+Four methods were tried, in order of rigor, and the outcome changed
+mid-exercise as tooling was found:
 
-1. **DXF (vector CAD data)** — never obtained. No CAD software was
-   available besides the free Autodesk DWG TrueView viewer, which does
-   not support DXF export (only DWG-version conversion and DWF/DWFx/PDF).
+1. **DXF (vector CAD data)** — at first, seemed unreachable: no CAD
+   software was available besides the free Autodesk DWG TrueView viewer,
+   which does not support DXF export (only DWG-version conversion and
+   DWF/DWFx/PDF). **Later obtained** using **ODA File Converter**, a free
+   tool from the Open Design Alliance built specifically for DWG↔DXF
+   conversion — a genuinely different tool from DWG TrueView, tried after
+   revisiting this limitation rather than accepting it as final. Converted
+   both sample drawings successfully.
 2. **PDF text extraction (mechanical, no vision)** — attempted for both
    drawings; worked (non-blank) for one, blank for the other (a
    screen-oriented plot style producing invisible colors on white paper).
@@ -89,19 +106,35 @@ Three methods were tried, in order of rigor:
    finding nothing, most likely because that layer uses an AutoCAD SHX
    font that rasterizes to curves on PDF export instead of embedding as
    text.
-3. **Vision reading of a rendered image** — the only one of the three
-   that actually works for this layer, and the method used for every
-   value in `data/plans/plan-div-sanitised4.json`.
+3. **Vision reading of a rendered image** — used for every value
+   originally recorded for drawing 1, before DXF was available. Later
+   cross-checked against the real DXF and found to match exactly (see
+   below) — the manual reading was accurate, just slower and less
+   reliable in principle than exact source text.
+4. **DXF raw-text search** (`src/extraction/dxf-search.ts`) — once real
+   DXF files existed, this became the most reliable method: exact source
+   text, not a vision read of a raster image. A first attempt used a
+   general-purpose DXF-parsing npm library to get a structured model of
+   every entity, and was abandoned after finding it doesn't support the
+   `MLEADER` entity type (where all the target callouts turned out to
+   live), among other problems — see `docs/design-decisions.md` for the
+   full postmortem. Replaced with a much narrower, `grep`-equivalent text
+   search, which is what actually extracted every value in both
+   `data/plans/*.json` files.
 
-**Net result**: no machine-readable vector geometry was ever obtained for
-either sample drawing. Every value in the plan data was read by eye off
-zoomed screenshots — which has a direct, honest consequence: the one
-purely geometric rule (SSW 1.2.4(a)) could not be evaluated against real
-coordinates, even though its engine (`src/geometry/distance.ts`) is fully
-built and unit-tested. The drawing shows a "1M SEWER SETBACK LINE" and the
-building appears, by eye, to respect it — but "appears to, on a
-screenshot" is not a computed distance, and this project does not report
-a verdict it cannot actually compute.
+**Net result**: both sample drawings now have real, exact-source-text
+data (`data/plans/plan-div-sanitised4.json` and
+`plan-annexA-sanitised2.json`), cross-validated against the original
+vision reading where both exist — every value matched exactly. What
+remains unfinished is narrower than "no DXF": the DXF files contain
+`LWPOLYLINE` geometry (confirmed: 239 such entities in one drawing
+alone), but extracting the *specific* polylines for a sewer centerline
+and a building footprint — what SSW 1.2.4(a) needs — hasn't been
+implemented; `dxf-search.ts` only reads text, not entity geometry. The
+drawing shows a "1M SEWER SETBACK LINE" and the building appears, by eye,
+to respect it — but "appears to, on a screenshot" is not a computed
+distance, and this project does not report a verdict it cannot actually
+compute.
 
 ## 4. How this was actually built: working with Claude Code
 
@@ -112,11 +145,11 @@ project was built in an interactive pairing session with **Claude Code**
 (Anthropic's CLI coding assistant), not solo and not by delegating the
 reasoning wholesale. The actual division of labor:
 
-**What Claude did**: read the drawings (vision — extracting labelled
-values off screenshots, since no CAD tooling was available), wrote the
-TypeScript implementation of decisions once they were made, explained CAD
-vocabulary and domain concepts (inspection chambers vs. manholes, what a
-haunching is, what "T" represents physically), and executed/verified the
+**What Claude did**: read the drawings (vision first, then DXF text
+search once that tooling existed), wrote the TypeScript implementation of
+decisions once they were made, explained CAD vocabulary and domain
+concepts (inspection chambers vs. manholes, what a haunching is, what "T"
+represents physically, what DXF/CAD/grep mean), and executed/verified the
 mechanics (running tests, git operations, cross-checking that documented
 file references actually exist on disk).
 
@@ -132,6 +165,18 @@ across two rules; and directing which parts of the exercise to prioritise
 (e.g. choosing not to spend real API credit finishing the vision
 extraction script — see `docs/design-decisions.md`).
 
+Also caught real problems in the *documentation itself* by pushing back
+rather than accepting a written claim at face value: questioning whether
+"no DXF" had actually been exhausted (leading to trying ODA File
+Converter, which worked, after DWG TrueView's inability to export DXF had
+been treated as final); catching several places where a limitation
+scoped to "the one drawing we checked" had been written as if it applied
+to "both drawings"; and catching a stale README description of a
+`src/geometry/` folder that didn't exist yet at the time. Each of these
+is a real correction to a document I would otherwise have signed my name
+to — worth being able to describe concretely, not just claim generically
+that "I reviewed the documentation."
+
 This mirrors, deliberately, how I already work day to day — the AI
 generative skills on my CV aren't decorative: this project used the same
 pairing workflow, with the same expectation that I understand and can
@@ -139,60 +184,74 @@ defend every decision, not just that the code runs.
 
 ## 5. Limitations, stated proactively
 
-- **No DXF** was ever obtained for either sample drawing — the single
-  biggest limitation. Exact geometric extraction (needed for SSW 1.2.4(a)
-  in particular) isn't possible without it.
-- **Only 1 of the 2 sample drawings was extracted into structured data**
-  (`data/plans/plan-div-sanitised4.json`). The second
-  (`Annex A - sanitised (2).dwg`) was reviewed manually and appeared, at
-  one point, to reference an "RC Trench"/"RC Sump" area, but that
-  specific callout was never re-located with confidence within the time
-  available, and nothing from it was extracted. This is a real scope gap,
-  not a claim that both drawings were fully processed.
-- **The geometric rule was never tested against real drawing data.** Its
-  engine is complete and unit-tested against synthetic coordinates
-  (including a regression test for a real intersection-detection bug
-  found while building it — see `docs/rules/ssw-1.2.4-a-no-structure-over-sewer.md`),
-  ready to run the moment real coordinates are available.
-- **No "RC Trench" construction section was found in the one drawing that
-  was fully processed** — only "RC Sump", a related but different
-  element. Whether the second, unprocessed drawing contains one is
-  unresolved, not ruled out. Three of the five rules resolve to
-  `NEEDS_REVIEW` because of this gap, not because the rule logic itself
-  is incomplete.
+- **Geometric coordinate extraction isn't implemented yet.** DXF is no
+  longer the blocker (see Section 3) -- both drawings have real DXF files
+  with `LWPOLYLINE` geometry in them -- but identifying and extracting
+  the *specific* sewer-centerline and building-footprint polylines SSW
+  1.2.4(a) needs hasn't been built. `dxf-search.ts` only reads text.
+- **The geometric rule was never tested against real drawing data**, as a
+  direct consequence of the point above. Its engine is complete and
+  unit-tested against synthetic coordinates (including a regression test
+  for a real intersection-detection bug found while building it — see
+  `docs/rules/ssw-1.2.4-a-no-structure-over-sewer.md`), ready to run the
+  moment that coordinate extraction exists.
+- **Drawing 2's "RC Trench" defers its own specification.** The one
+  element in this project explicitly labelled "RC Trench" was found on
+  drawing 2, but its own callout text says "TO PE'S DETAIL" — the actual
+  backfill/cover/depth/diameter values live on a separate Professional
+  Engineer's detail drawing not included in this sample. This isn't a
+  search failure (backfill/cover/haunching vocabulary was specifically
+  searched for and returned zero matches) -- the drawing set genuinely
+  doesn't contain that information.
+- **Drawing 2 has no unambiguous IC/MH pairing.** It has an inspection
+  chamber ("EXT'G IC TO BE RETAINED AND MADE GOOD") but no "LAST IC"/"LAST
+  MH" naming convention like drawing 1's, and the only nearby manhole text
+  found is on a wildly different elevation scale (~2m vs. the IC's 29.5m)
+  -- almost certainly unrelated. Left unpaired rather than guessed.
 - **The vision-extraction API script has never been run** for real (see
   `docs/design-decisions.md` for the cost reasoning) — it's written and
   type-checked against the current Anthropic SDK's documented patterns,
-  but its output has never been observed.
+  but its output has never been observed. It's also no longer the primary
+  extraction path (DXF search superseded it once DXF became available),
+  so this is a smaller gap than it was earlier in the project.
 - **Confidence scores are hand-estimated, not calibrated** — they reflect
   extraction-method reliability (a proxy), not a measured error rate.
 
 ## 6. What I'd do differently with more time
 
-- Get DXF (or a working, legible PDF) before writing a single line of
-  rule code, rather than discovering the gap mid-exercise — this cost the
-  most time in the whole exercise, more than any of the rule logic.
-- With real vector geometry, extraction would change character entirely:
-  find text entities near a known block reference, associate them with
-  the nearest polyline/polygon on a known layer, and fall back to vision
-  only when the CAD data itself is ambiguous or absent — more scalable
-  and more auditable than vision-only reading.
-- Resolve the RC Trench vs. RC Sump terminology question with an actual
-  reviewer rather than defaulting to `NEEDS_REVIEW` — and check whether
-  RC Trench cross-sections exist elsewhere in a fuller drawing set that
-  simply wasn't in this sample.
+- Try every free/open alternative tool before treating a limitation as
+  final. "DWG TrueView can't export DXF" was true; "DXF is unreachable"
+  wasn't — ODA File Converter, a different free tool, closed that gap
+  after it had already been written up as the project's single biggest
+  limitation. The lesson isn't "get DXF earlier" (which did happen, just
+  later than ideal) -- it's to keep separate "this specific tool can't do
+  X" from "X isn't possible," and revisit the latter before accepting it.
+- Same lesson, smaller scale: the second drawing's "RC Trench" was
+  abandoned as an unfindable screenshot lead, then found in seconds once
+  better tooling (DXF search) existed. A documented limitation is a
+  snapshot of what was true *then*, not a permanent verdict -- worth
+  re-checking once the tooling that produced it has changed.
+- Extract the sewer-centerline/building-footprint geometry SSW 1.2.4(a)
+  needs from the DXF `LWPOLYLINE` data now available -- the one piece of
+  the whole pipeline that's specified, engineered, and tested, but not
+  yet wired to real coordinates.
+- Get the actual "PE's detail" drawing referenced by drawing 2's RC
+  Trench callout, if it exists in a fuller set -- would resolve Annex
+  A(a)/(b)/(c) for that element with real data instead of `NEEDS_REVIEW`.
 - Finish and actually run the vision-extraction script once a small API
-  budget is justified, and compare its output against the manual reads
+  budget is justified, now specifically as a fallback for whatever DXF
+  text search can't find (a value shown only graphically, with no text
+  label at all), and compare its output against the DXF-confirmed values
   already recorded, to get a real (not estimated) confidence baseline.
 
 ## 7. Running it
 
 ```bash
 npm install
-npm test          # 18 tests: every rule against its own rule card's sample
-                   # scenarios, plus real values read off the sample drawing
+npm test          # 23 tests: every rule against its own rule card's sample
+                   # scenarios, plus real values extracted from both drawings
 npm run typecheck  # tsc --noEmit -- Node runs .ts files natively, this is
                    # a separate, real type-check
-npm run adjudicate # full report: all 5 rules against the real extracted
-                   # drawing data (data/plans/plan-div-sanitised4.json)
+npm run adjudicate # full report: all 5 rules against every drawing in
+                   # data/plans/*.json
 ```
