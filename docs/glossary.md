@@ -18,6 +18,8 @@ it — so the reasoning behind each reading is traceable later.
 | **M/S** | Mild Steel — a common structural steel grade. | "REMOVABLE M/S GRATING COVER" |
 | **Grating** | A mesh/grid-pattern cover (lets water/air through), as opposed to a solid slab. | "REMOVABLE M/S GRATING COVER" |
 | **PUB** | Public Utilities Board — Singapore's national water agency (water supply, drainage, sewerage). The regulator whose approval Rule SSW 1.2.4(a) requires before building over/across a sewer. | Filenames ("DXC x PUB..."), rule text of SSW 1.2.4(a) |
+| **SSW** | Sewerage and Sanitary Works — from the handbook title itself, *"Code of Practice on Sewerage and Sanitary Works"*. Confirmed, not a guess: every rule card states this as its `Handbook` field. | Every `Rule ID`, e.g. "SSW 1.2.1 (b)" |
+| **DXC** | **Unconfirmed guess, not verified anywhere in the provided documents.** Most likely DXC Technology, a real IT/engineering consultancy — the filename pattern `(DXC x PUB) ...` reads like the common AEC convention "[consultant] x [client]", so probably the firm that produced the drawing, working for PUB. Flagged explicitly as a guess rather than presented as fact. | Drawing filenames, e.g. "(DXC x PUB) 1.2.1b, ... -sanitised (4).dwg" |
 
 ## Why this matters
 
