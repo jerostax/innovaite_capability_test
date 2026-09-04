@@ -72,13 +72,41 @@ the flat 750mm rule or the 900+T formula applies there is untested
 against ground truth. Assumed 900+T (inherits the row above), flagged as
 an assumption rather than resolved with confidence — see the rule JSON.
 
-## Reading it off the sample drawing
+## Reading it off drawing 1
 
 File: `(DXC x PUB) 1.2.1b, 1.1.3a, 1.2.4a, 1.2.4b, 4.2.1 (div) -sanitised (4).dwg`
 
 Same as Annex A(a)/(c): no element labelled "RC Trench" was found — only
 "RC Sump". Resolves to `NEEDS_REVIEW` via the shared `requireElementType()`
 gate before any width arithmetic is attempted.
+
+## Reading it off drawing 2 -- the one real "RC Trench" in this project
+
+File: `(DXC x PUB) 1.2.1b, 1.1.3a, 1.1.3 (bii), Annex A - sanitised (2).dwg`
+
+Found via `src/extraction/dxf-search.ts` after an earlier screenshot-based
+search for it had been abandoned (see `docs/write-up.md`, Section 3):
+
+> "NEW 750MM WIDE RC TRENCH OVER EXTG MINOR SEWER LINE TO PE'S DETAIL"
+
+This is genuine, exact source text — not a vision read. It gives
+**trenchWidth_mm: 750** directly. Everything else this rule needs
+(sewer depth, nominal diameter, haunching thickness) was specifically
+searched for and not found: no "DEPTH" or "M DEEP" text near the trench
+or the minor sewer it crosses, and no "HAUNCH" anywhere in the file. A
+nearby annotation ("EXT'G ⌀150 Y-JUNCTION CONNECTION TO SEWER LINE") may
+describe the same pipe (diameter 150mm) — but the text search method used
+here doesn't confirm spatial association, so `sewerNominalDiameter_mm`
+is left null rather than assumed from proximity. The callout's own "TO
+PE'S DETAIL" explains the gap: the full specification is on a separate
+engineer's detail drawing not included in this sample.
+
+Result: `elementType` passes the gate this time, but the rule still
+resolves to `NEEDS_REVIEW` — missing depth and diameter are a genuine
+extraction/documentation gap here, not an extraction *failure* on our
+part (see `docs/design-decisions.md`, "Missing data: extraction failure
+vs. design failure" — this case is closer to the drawing set being
+incomplete than either of the two categories that principle contrasts).
 
 ## Traceability
 

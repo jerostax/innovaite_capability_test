@@ -31,7 +31,7 @@ being labelled "RC Trench" — full reasoning, the options weighed, and why
 the sample drawing's "RC Sump" elements don't qualify:
 [`design-decisions.md`](../design-decisions.md#rc-trench-vs-rc-sump-the-decision-behind-requireelementtype).
 
-## Reading it off the sample drawing
+## Reading it off drawing 1
 
 File: `(DXC x PUB) 1.2.1b, 1.1.3a, 1.2.4a, 1.2.4b, 4.2.1 (div) -sanitised (4).dwg`
 
@@ -46,11 +46,30 @@ Neither is labelled "RC Trench". Both resolve to `NEEDS_REVIEW` per the
 decision above — the cover data was never even evaluated, because the
 element-type check stops first.
 
+## Reading it off drawing 2
+
+File: `(DXC x PUB) 1.2.1b, 1.1.3a, 1.1.3 (bii), Annex A - sanitised (2).dwg`
+
+This drawing's one "RC Trench" element ("NEW 750MM WIDE RC TRENCH OVER
+EXTG MINOR SEWER LINE TO PE'S DETAIL" — see
+[`annex-a-b-trench-width.md`](annex-a-b-trench-width.md) for how it was
+found) passes the element-type gate this time. But its cover is never
+described anywhere on the drawing: "REMOVABLE" and "LIFTING" were both
+specifically searched for in the DXF and returned zero matches for this
+element. Same root cause as the missing width/depth data: the callout
+defers everything to a separate "PE's detail" drawing not in this
+sample. Resolves to `NEEDS_REVIEW` for a genuinely different reason than
+drawing 1 — a real "RC Trench" with unknown cover, not a terminology
+mismatch.
+
 ## Verdict
 
 ```
-elementType: "RC Sump"  !=  "RC Trench"  →  NEEDS_REVIEW
-(the cover itself is never checked -- the type mismatch is caught first)
+Drawing 1: elementType "RC Sump" != "RC Trench" → NEEDS_REVIEW
+           (cover never even checked -- the type mismatch is caught first)
+Drawing 2: elementType "RC Trench" matches, but cover.present/removable/
+           hasLiftingFeature are all genuinely absent from the drawing
+           ("TO PE'S DETAIL") → NEEDS_REVIEW
 ```
 
 ## Traceability

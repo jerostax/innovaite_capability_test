@@ -37,7 +37,7 @@ This rule is written against "RC Trench" specifically, exactly like
 Annex A(c) — full reasoning (why, and the shared `requireElementType()`
 function this uses): [`design-decisions.md`](../design-decisions.md#rc-trench-vs-rc-sump-the-decision-behind-requireelementtype).
 
-## Reading it off the sample drawing
+## Reading it off drawing 1
 
 File: `(DXC x PUB) 1.2.1b, 1.1.3a, 1.2.4a, 1.2.4b, 4.2.1 (div) -sanitised (4).dwg`
 
@@ -48,11 +48,27 @@ drawing at all (would fail the missing-data check too, if the type gate
 didn't already stop it first). Two separate reasons this rule can't be
 answered from this sample, either one sufficient on its own.
 
+## Reading it off drawing 2
+
+File: `(DXC x PUB) 1.2.1b, 1.1.3a, 1.1.3 (bii), Annex A - sanitised (2).dwg`
+
+This drawing does have a real "RC Trench" element (width detail:
+[`annex-a-b-trench-width.md`](annex-a-b-trench-width.md)): "NEW 750MM
+WIDE RC TRENCH OVER EXTG MINOR SEWER LINE **TO PE'S DETAIL**". The
+element type gate passes this time -- but
+the rule still resolves to `NEEDS_REVIEW`, for a different reason:
+backfill material was specifically searched for (SAND, GRANITE, GRAVEL,
+CRUSHER, AGGREGATE, BACKFILL -- all zero matches) and is genuinely absent
+from this drawing. The callout text explains why: the construction
+specification is deferred to a separate Professional Engineer's detail
+drawing, not included in this sample.
+
 ## Verdict
 
 ```
-elementType: "RC Sump"  !=  "RC Trench"  →  NEEDS_REVIEW
-(backfill material is never even checked -- the type mismatch is caught first)
+Drawing 1: elementType "RC Sump" != "RC Trench" → NEEDS_REVIEW
+Drawing 2: elementType "RC Trench" matches, but backfillMaterial is
+           genuinely absent from the drawing ("TO PE'S DETAIL") → NEEDS_REVIEW
 ```
 
 ## Traceability

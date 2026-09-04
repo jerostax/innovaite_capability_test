@@ -22,12 +22,17 @@ ELSE:
     NON_COMPLIANT
 ```
 
-## Reading it off the sample drawing
+## Reading it off drawing 1
 
 File: `(DXC x PUB) 1.2.1b, 1.1.3a, 1.2.4a, 1.2.4b, 4.2.1 (div) -sanitised (4).dwg`
 
 Two annotated callout boxes near the property boundary give both values
-directly (see [glossary.md](../glossary.md) for `IC`/`MH`/`TL` definitions):
+directly (see [glossary.md](../glossary.md) for `IC`/`MH`/`TL` definitions).
+Originally read from a zoomed screenshot; later cross-checked against a
+real DXF (converted from the source DWG via ODA File Converter, see
+`docs/design-decisions.md`) using `src/extraction/dxf-search.ts` — the
+exact source text matches every value below, so the original manual
+reading is now confirmed, not just assumed accurate:
 
 | Element | Callout on drawing | Existing TL | New (proposed) TL |
 |---|---|---|---|
@@ -41,11 +46,25 @@ development will actually be built in, not its current as-found state.
 This isn't spelled out explicitly in the rule text — it's an assumption,
 noted here rather than applied silently.
 
+## Reading it off drawing 2
+
+File: `(DXC x PUB) 1.2.1b, 1.1.3a, 1.1.3 (bii), Annex A - sanitised (2).dwg`
+
+This drawing has an inspection chamber ("EXT'G IC TO BE RETAINED AND MADE
+GOOD", T.L. 29.500m), but no "LAST IC"/"LAST MH" naming convention like
+drawing 1's to identify which manhole it connects to. The only nearby
+manhole text found ("EXISTING MH (SEW)", with GIS IDs) is on a
+completely different elevation scale (~2.0–2.2m, versus this IC's
+29.500m) — almost certainly an unrelated reference, not the connecting
+manhole. Rather than guess a pairing from proximity alone,
+`manholeTopLevel_m` is left `null`.
+
 ## Verdict
 
 ```
-110.460 (IC, new) >= 110.450 (MH, new)  →  COMPLIANT
-margin: 10mm
+Drawing 1: 110.460 (IC, new) >= 110.450 (MH, new)  →  COMPLIANT
+           margin: 10mm
+Drawing 2: IC found (T.L. 29.500m), no confirmed connecting manhole → NEEDS_REVIEW
 ```
 
 ## Traceability
