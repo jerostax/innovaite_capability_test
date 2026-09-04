@@ -24,24 +24,28 @@ bottleneck.
 Before writing any rule code, all five rule cards and both sample
 drawings were read in full. Two things surfaced immediately:
 
-- **Filenames didn't match rule contents -- in the very first files sent,
-  before the official pack was located.** One file, sent standalone
-  ahead of the official "Capability Testing Pack," was named `SSW 1.2.1
-  (b) Top level of manhole to inspection chamber.docx` but its actual
-  content was Annex A(c) (trench cover). This was NOT a property of the
-  rule cards themselves -- the correctly-named copy of the same filename
-  inside the official "Capability Testing Pack" (`Annex A - The rules/SSW
-  1.2.1 (b) Top level of manhole to inspection chamber.docx`) has the
-  right content (confirmed: `Rule ID: SSW 1.2.1 (b)`, matching its own
-  filename exactly) and is the one this project actually uses throughout.
-  The two files share a name but are different files -- proven by
-  comparing byte size (380,337 bytes for the mismatched one sent first vs.
-  445,415 bytes for the correct one in the official pack) and by reading
-  both. Once the official pack was available, every rule was sourced from
-  it. The lasting design decision, though, is unaffected by which specific
-  copy was mislabeled: the engine identifies a rule by the `Rule ID` field
+- **A handful of individual files sent before the official pack was
+  available had names that didn't match their content -- the official
+  "Capability Testing Pack" itself has always been internally consistent
+  and is not implicated.** Re-verified directly: a fresh copy of the
+  official pack, downloaded again from the recruiter just to check this,
+  has `Annex A - The rules/SSW 1.2.1 (b) Top level of manhole to
+  inspection chamber.docx` containing exactly `Rule ID: SSW 1.2.1 (b)` --
+  correct, as expected, no discrepancy. The mismatch was specific to an
+  earlier, separate delivery: four individual rule files sent directly in
+  conversation about 16 minutes before the official pack was located and
+  used from then on. One of those four, sharing that same filename, was
+  380,337 bytes and its actual content was Annex A(c) (trench cover) --
+  confirmed by reading it, and distinguishable from the correct 445,415-byte
+  file the official pack has under the identical name. Where those four
+  early files originated, or why they were mismatched, is not established
+  -- only that they were not sourced from the same official pack archive
+  re-verified here, and that every rule in this project was built from the
+  official pack's correct copies from the point that pack was located
+  onward. The lasting design decision doesn't depend on resolving that
+  origin question: the engine identifies a rule by the `Rule ID` field
   read from inside the document, never by filename -- because a filename
-  was proven unreliable once, in this exact project, not on principle
+  was proven unreliable at least once in this project, not on principle
   alone.
 - **The rule text and its own worked examples sometimes disagree with
   each other** (see Annex A(b) below). Worked numeric examples were
